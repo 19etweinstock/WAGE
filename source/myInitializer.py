@@ -1,4 +1,6 @@
 """Weight initializers for use with layers."""
+from __future__ import division
+from past.utils import old_div
 import math
 from tensorflow.python.framework import dtypes
 from tensorflow.python.ops import random_ops
@@ -94,8 +96,8 @@ def variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False,
       scale = 1.0
       if bitsW < 32:
         beta = 1.5
-        Wm = beta / Quantize.S(bitsW)
-        scale = 2 ** round(math.log(Wm / limit, 2.0))
+        Wm = old_div(beta, Quantize.S(bitsW))
+        scale = 2 ** round(math.log(old_div(Wm, limit), 2.0))
         scale = scale if scale > 1 else 1.0
         # limit *= scale
         limit = Wm if Wm > limit else limit
@@ -104,12 +106,12 @@ def variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False,
 
     if uniform:
       # To get stddev = math.sqrt(factor / n) need to adjust for uniform.
-      limit = scaleLimit(math.sqrt(3.0 * factor / n))
+      limit = scaleLimit(math.sqrt(old_div(3.0 * factor, n)))
       return random_ops.random_uniform(shape, -limit, limit,dtype, seed=seed)
 
     else:
       # To get stddev = math.sqrt(factor / n) need to adjust for truncated.
-      trunc_stddev = scaleLimit(math.sqrt(1.3 * factor / n))
+      trunc_stddev = scaleLimit(math.sqrt(old_div(1.3 * factor, n)))
       return random_ops.truncated_normal(shape, 0.0, trunc_stddev, dtype,
                                          seed=seed)
   # pylint: enable=unused-argument

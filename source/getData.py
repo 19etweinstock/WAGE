@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import tensorflow as tf
 import numpy as np
 import Option
@@ -18,7 +22,7 @@ def preprocess(x, train=False):
       x = tf.random_crop(x, [32, 32, 3])
       x = tf.image.random_flip_left_right(x)
   else:
-    print 'Unkown dataset',dataSet,'no preprocess'
+    print('Unkown dataset',dataSet,'no preprocess')
   x = tf.transpose(x, [2, 0, 1])# from HWC to CHW
   return x
 
@@ -124,7 +128,7 @@ def loadTFRecord(pattern,batch_size,train=False):
 
   data_files = tf.gfile.Glob(pattern)
   if not data_files:
-    print 'No files found'
+    print('No files found')
   # Create filename_queue
   if train:
     filename_queue = tf.train.string_input_producer(data_files, shuffle=True, capacity=16)
@@ -177,22 +181,22 @@ def loadTFRecord(pattern,batch_size,train=False):
 
 
 def data2Queue(dataX, dataY, batchSize, numThreads, shuffle=False, isTraining=True, seed=None):
-  q = tf.FIFOQueue(capacity=dataX.shape[0], dtypes=[dataX.dtype, dataY.dtype],shapes=[dataX.shape[1:],dataY.shape[1:]])
+  q = tf.queue.FIFOQueue(capacity=dataX.shape[0], dtypes=[dataX.dtype, dataY.dtype],shapes=[dataX.shape[1:],dataY.shape[1:]])
   enqueue_op = q.enqueue_many([dataX, dataY])
   sampleX, sampleY = q.dequeue()
-  qRunner = tf.train.QueueRunner(q, [enqueue_op])
-  tf.train.add_queue_runner(qRunner)
+  qRunner = tf.compat.v1.train.QueueRunner(q, [enqueue_op])
+  tf.compat.v1.train.add_queue_runner(qRunner)
 
   sampleX_ = preprocess(sampleX, isTraining)
 
   if shuffle:
-    batchX, batchY = tf.train.shuffle_batch([sampleX_, sampleY],
+    batchX, batchY = tf.compat.v1.train.shuffle_batch([sampleX_, sampleY],
                                             batch_size=batchSize,
                                             num_threads=numThreads, capacity=dataX.shape[0],
-                                            min_after_dequeue=dataX.shape[0] / 2,
+                                            min_after_dequeue=old_div(dataX.shape[0], 2),
                                             seed=seed)
   else:
-    batchX, batchY = tf.train.batch([sampleX_, sampleY],
+    batchX, batchY = tf.compat.v1.train.batch([sampleX_, sampleY],
                                     batch_size=batchSize,
                                     num_threads=numThreads,
                                     capacity=dataX.shape[0])

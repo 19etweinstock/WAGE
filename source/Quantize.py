@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 import tensorflow as tf
 import Option
 
@@ -8,13 +10,13 @@ bitsG = Option.bitsG
 bitsE = Option.bitsE
 bitsR = Option.bitsR
 
-Graph = tf.get_default_graph()
+Graph = tf.compat.v1.get_default_graph()
 
 def S(bits):
   return 2.0 ** (bits - 1)
 
 def Shift(x):
-  return 2 ** tf.round(tf.log(x) / tf.log(2.0))
+  return 2 ** tf.round(old_div(tf.compat.v1.log(x), tf.compat.v1.log(2.0)))
 
 def C(x, bits=32):
   if bits > 15 or bits == 1:
@@ -33,13 +35,13 @@ def Q(x, bits):
     return tf.sign(x)
   else:
     SCALE = S(bits)
-    return tf.round(x * SCALE) / SCALE
+    return old_div(tf.round(x * SCALE), SCALE)
 
 def W(x,scale = 1.0):
   with tf.name_scope('QW'):
     y = Q(C(x, bitsW), bitsW)
     if scale > 1.8:
-      y = y/scale
+      y = old_div(y,scale)
     return x + tf.stop_gradient(y - x)  # skip derivation of Quantize and Clip
 
 def A(x):
@@ -56,18 +58,18 @@ def G(x):
       if x.name.lower().find('batchnorm') > -1:
         return x  # batch norm parameters, not quantize now
 
-      xmax = tf.reduce_max(tf.abs(x))
-      x = x / Shift(xmax)
+      xmax = tf.compat.v1.reduce_max(tf.abs(x))
+      x = old_div(x, Shift(xmax))
 
       norm = Q(LR * x , bitsR)
       norm_sign = tf.sign(norm)
       norm_abs = tf.abs(norm)
       norm_int = tf.floor(norm_abs)
       norm_float = norm_abs - norm_int
-      rand_float = tf.random_uniform(x.get_shape(), 0, 1)
+      rand_float = tf.compat.v1.random_uniform(x.get_shape(), 0, 1)
       norm = norm_sign * ( norm_int + 0.5 * (tf.sign(norm_float - rand_float) + 1) )
 
-      return norm / S(bitsG)
+      return old_div(norm, S(bitsG))
 
 @tf.RegisterGradient('Error')
 def error(op, x):
@@ -76,7 +78,7 @@ def error(op, x):
   else:
     xmax = tf.reduce_max(tf.abs(x))
     xmax_shift = Shift(xmax)
-    return Q(C( x /xmax_shift, bitsE), bitsE)
+    return Q(C( old_div(x,xmax_shift), bitsE), bitsE)
 
 def E(x):
   with tf.name_scope('QE'):

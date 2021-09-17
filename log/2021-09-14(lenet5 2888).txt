@@ -1,0 +1,139 @@
+2021-09-14 19:53:39 
+
+import time
+import tensorflow as tf
+
+tf.compat.v1.disable_eager_execution()
+tf.compat.v1.disable_v2_behavior()
+
+Time = time.strftime('%Y-%m-%d', time.localtime())
+Notes = 'lenet5 2888'
+# Notes = 'lenet5 2888'
+# Notes = 'alexnet 28CC'
+
+GPU = [0]
+batchSize = 128
+validNum = 0
+
+dataSet = 'MNIST'  # 'MNIST','SVHN','CIFAR10', 'ILSVRC2012'
+
+loadModel = None
+# loadModel = '../model/' + '2017-10-26' + '(' + 'vgg7 2888' + ')' + '.tf'
+# saveModel = None
+saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
+
+bitsW = 1  # bit width of weights
+bitsA = 1  # bit width of activations
+bitsG = 8  # bit width of gradients
+bitsE = 8 # bit width of errors
+
+bitsR = 16  # bit width of randomizer
+
+use_batch_norm = False
+lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)
+lr_schedule = [0,1]
+# lr_schedule = [0, 8, 200, 1,250,1./8,300,0]
+# lr_schedule = [0, 32, 40, 32./8, 60, 32./64, 80, 0]
+L2 = 0
+
+lossFunc = 'SSE'
+# lossFunc = tf.losses.softmax_cross_entropy
+optimizer = tf.compat.v1.train.GradientDescentOptimizer(1)  # lr is controlled in Quantize.G
+
+# shared variables, defined by other files
+seed = None
+sess = None
+W_scale = []
+
+W: /device:GPU:0 Conv/conv0/ [5, 5, 1, 32] Scale:4
+W: /device:GPU:0 Conv/conv1/ [5, 5, 32, 64] Scale:32
+W: /device:GPU:0 Fc/fc0/ [1024, 512] Scale:32
+W: /device:GPU:0 Fc/fc1/ [512, 10] Scale:16
+CONV: 52000 FC: 529408 Total: 581408
+W: /device:GPU:0 Conv_1/conv0/ [5, 5, 1, 32] Scale:4
+W: /device:GPU:0 Conv_1/conv1/ [5, 5, 32, 64] Scale:32
+W: /device:GPU:0 Fc_1/fc0/ [1024, 512] Scale:32
+W: /device:GPU:0 Fc_1/fc1/ [512, 10] Scale:16
+
+Optimization Start!
+
+lr: 0.000000 -> 1.000000
+Epoch: 000  Loss: 672.028846 Train: 0.5232 Test: 0.4115 FPS: 7717 
+Epoch: 001  Loss: 620.847222 Train: 0.4093 Test: 0.4302 FPS: 12023 
+Epoch: 002  Loss: 594.439103 Train: 0.4609 Test: 0.5646 FPS: 11346 
+Epoch: 003  Loss: 570.461538 Train: 0.5077 Test: 0.4769 FPS: 10407 
+Epoch: 004  Loss: 527.271368 Train: 0.5531 Test: 0.5905 FPS: 10829 
+Epoch: 005  Loss: 462.570513 Train: 0.4997 Test: 0.0911 FPS: 11618 S BEST 
+Epoch: 006  Loss: nan Train: 0.6966 Test: 1.0000 FPS: 11494 
+Epoch: 007  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11644 
+Epoch: 008  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11605 
+Epoch: 009  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11607 
+Epoch: 010  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11540 
+Epoch: 011  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11574 
+Epoch: 012  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11200 
+Epoch: 013  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11385 
+Epoch: 014  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11425 
+Epoch: 015  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11454 
+Epoch: 016  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11520 
+Epoch: 017  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11504 
+Epoch: 018  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11401 
+Epoch: 019  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11516 
+Epoch: 020  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11484 
+Epoch: 021  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11503 
+Epoch: 022  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11490 
+Epoch: 023  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11458 
+Epoch: 024  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11187 
+Epoch: 025  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11303 
+Epoch: 026  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11447 
+Epoch: 027  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11285 
+Epoch: 028  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11266 
+Epoch: 029  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11259 
+Epoch: 030  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11333 
+Epoch: 031  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11403 
+Epoch: 032  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11385 
+Epoch: 033  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11279 
+Epoch: 034  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11250 
+Epoch: 035  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11306 
+Epoch: 036  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10642 
+Epoch: 037  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10994 
+Epoch: 038  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11324 
+Epoch: 039  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11346 
+Epoch: 040  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11293 
+Epoch: 041  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11305 
+Epoch: 042  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10996 
+Epoch: 043  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11165 
+Epoch: 044  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11308 
+Epoch: 045  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11203 
+Epoch: 046  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11199 
+Epoch: 047  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11191 
+Epoch: 048  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11277 
+Epoch: 049  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10522 
+Epoch: 050  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11091 
+Epoch: 051  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11253 
+Epoch: 052  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11236 
+Epoch: 053  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11288 
+Epoch: 054  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11200 
+Epoch: 055  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11154 
+Epoch: 056  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10781 
+Epoch: 057  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11182 
+Epoch: 058  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11245 
+Epoch: 059  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11234 
+Epoch: 060  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11126 
+Epoch: 061  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10915 
+Epoch: 062  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11321 
+Epoch: 063  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11321 
+Epoch: 064  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11386 
+Epoch: 065  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11434 
+Epoch: 066  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11447 
+Epoch: 067  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11369 
+Epoch: 068  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11308 
+Epoch: 069  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11319 
+Epoch: 070  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11405 
+Epoch: 071  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11329 
+Epoch: 072  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11209 
+Epoch: 073  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11145 
+Epoch: 074  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11197 
+Epoch: 075  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11043 
+Epoch: 076  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10753 
+Epoch: 077  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 10582 
+Epoch: 078  

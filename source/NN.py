@@ -1,8 +1,11 @@
+from __future__ import print_function
+from builtins import object
 import tensorflow as tf
 import Option
-from tensorflow.contrib.layers import batch_norm
+# import tensorflow.compat.v1.layers.batch_normalization as batch_norm
 import Quantize
 import myInitializer
+from functools import reduce
 
 
 class NN(object):
@@ -56,7 +59,7 @@ class NN(object):
   def _LeNet5(self):
     x = self.H[-1]
 
-    with tf.variable_scope('Conv'):
+    with tf.compat.v1.variable_scope('Conv'):
       x = self._conv(x, 5, 32, padding='VALID', name='conv0')
       x = self._pool(x, 'MAX', 2, 2)
       x = self._activation(x)
@@ -67,7 +70,7 @@ class NN(object):
 
     x = self._reshape(x)
 
-    with tf.variable_scope('Fc'):
+    with tf.compat.v1.variable_scope('Fc'):
       x = self._fc(x, 512, name='fc0')
       x = self._activation(x)
       x = self._fc(x, self.shapeY[1], name='fc1')
@@ -187,11 +190,11 @@ class NN(object):
         loss += self.L2 * self._L2()
 
     # error calculation
-    with tf.name_scope('error'):
+    with tf.compat.v1.name_scope('error'):
       if self.Y.dtype != tf.float32:  # classification labels
-        label = tf.argmax(labels, axis=1)
+        label = tf.compat.v1.argmax(labels, axis=1)
         in_top_k = 5 if self.shapeY[1] > 100 else 1
-        error = tf.reduce_mean(tf.cast(tf.logical_not(tf.nn.in_top_k(out, label, in_top_k)), tf.float32))
+        error = tf.compat.v1.reduce_mean(tf.compat.v1.cast(tf.compat.v1.logical_not(tf.compat.v1.nn.in_top_k(out, label, in_top_k)), tf.float32))
       else:  # regression errors
         error = loss
 
@@ -232,20 +235,20 @@ class NN(object):
     with tf.name_scope(name) as scope:
       if len(self.GPU) > 1:
         with tf.device('/gpu:%d'%Option.GPU[0]):
-          self.W.append(tf.get_variable(name=name, shape=shape, initializer=self.initializer))
+          self.W.append(tf.compat.v1.get_variable(name=name, shape=shape, initializer=self.initializer))
       else:
-        self.W.append(tf.get_variable(name=name, shape=shape, initializer=self.initializer))
+        self.W.append(tf.compat.v1.get_variable(name=name, shape=shape, initializer=self.initializer))
 
-      print 'W:', self.W[-1].device, scope, shape,
+      print('W:', self.W[-1].device, scope, shape, end=' ')
       if Quantize.bitsW <= 16:
-        self.W_q_op.append(tf.assign(self.W[-1], Quantize.Q(self.W[-1], Quantize.bitsW)))
-        self.W_clip_op.append(tf.assign(self.W[-1],Quantize.C(self.W[-1],Quantize.bitsW)))
+        self.W_q_op.append(tf.compat.v1.assign(self.W[-1], Quantize.Q(self.W[-1], Quantize.bitsW)))
+        self.W_clip_op.append(tf.compat.v1.assign(self.W[-1],Quantize.C(self.W[-1],Quantize.bitsW)))
         scale = Option.W_scale[len(self.W)-1]
-        print 'Scale:%d' % scale
+        print('Scale:%d' % scale)
         self.W_q.append(Quantize.W(self.W[-1],scale))
         return self.W_q[-1]
       else:
-        print ''
+        print('')
         return self.W[-1]
 
 
@@ -277,7 +280,8 @@ class NN(object):
 
   def _batch_norm(self, x, data_format='NCHW'):
     if self.use_batch_norm is True:
-      x = batch_norm(x, center=True, scale=True, is_training=self.is_training, decay=0.9, epsilon=1e-5, fused=True, data_format=data_format)
+      # x = batch_norm(x, center=True, scale=True, training=self.is_training, momentum=0.9, epsilon=1e-5, fused=True, data_format=data_format)
+      x = tf.keras.layers.BatchNormalization(center=True, scale=True, momentum=0.9, epsilon=1e-5)(x, training=True)
       self.H.append(x)
     return x
 
@@ -291,14 +295,14 @@ class NN(object):
   def _totalParameters(self):
     total_parameters_fc = 0
     total_parameters_conv = 0
-    for var in tf.trainable_variables():
+    for var in tf.compat.v1.trainable_variables():
       name_lowcase = var.op.name.lower()
       if name_lowcase.find('fc') > -1:
         total_parameters_fc += reduce(lambda x, y: x * y, var.get_shape().as_list())
       elif name_lowcase.find('conv') > -1:
         total_parameters_conv += reduce(lambda x, y: x * y, var.get_shape().as_list())
     total_parameters = total_parameters_fc + total_parameters_conv
-    print 'CONV: %d FC: %d Total: %d' % (total_parameters_conv,total_parameters_fc,total_parameters)
+    print('CONV: %d FC: %d Total: %d' % (total_parameters_conv,total_parameters_fc,total_parameters))
     return total_parameters
 
   def _L2(self):

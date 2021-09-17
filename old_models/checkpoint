@@ -1,0 +1,2 @@
+model_checkpoint_path: "2021-09-14(MNIST 2288 16 [0, 1] 100).tf"
+all_model_checkpoint_paths: "2021-09-14(MNIST 2288 16 [0, 1] 100).tf"
