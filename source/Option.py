@@ -4,10 +4,10 @@ import tensorflow as tf
 tf.compat.v1.disable_eager_execution()
 tf.compat.v1.disable_v2_behavior()
 
-bitsW = 2  # bit width of weights
-bitsA = 2  # bit width of activations
-bitsG = 8  # bit width of gradients
-bitsE = 8 # bit width of errors
+bitsW = 1  # bit width of weights
+bitsA = 1  # bit width of activations
+bitsG = 12  # bit width of gradients
+bitsE = 12 # bit width of errors
 
 bitsR = 16  # bit width of randomizer
 
@@ -16,14 +16,17 @@ lr_schedule = [0,1]
 Epoch = 100
 
 batchSize = 128
+use_batch_norm = False
 
 dataSet = 'MNIST'  # 'MNIST','SVHN','CIFAR10', 'ILSVRC2012'
 
 def upper(str):
     return str.upper()
 
-Time = time.strftime('%Y-%m-%d', time.localtime())
-Notes = f'{dataSet} {bitsW}{bitsA}{upper(hex(bitsG)[2:])}{upper(hex(bitsE)[2:])} {bitsR} {lr_schedule} {Epoch} {batchSize}'
+batch_text = 'batch norm' if use_batch_norm else ''
+
+Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
+Notes = f'{dataSet} {bitsW}{bitsA}{upper(hex(bitsG)[2:])}{upper(hex(bitsE)[2:])} {bitsR} {lr_schedule} {Epoch} {batchSize} {batch_text}'
 # Notes = 'lenet5 2888'
 # Notes = 'alexnet 28CC'
 
@@ -37,7 +40,6 @@ loadModel = None
 saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
 
 
-use_batch_norm = False
 lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)
 # lr_schedule = [0, 8, 200, 1,250,1./8,300,0]
 # lr_schedule = [0, 32, 40, 32./8, 60, 32./64, 80, 0]
