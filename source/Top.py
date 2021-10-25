@@ -135,13 +135,20 @@ def main():
 
     if epoch == 0:
       errorTestBest = errorTest
+      errorTrainBest = errorTotal
 
     if errorTest < errorTestBest:
+      errorTestBest = errorTest
       if Option.saveModel is not None:
         saver.save(sess, Option.saveModel)
         print('S', end=' ')
-    if errorTest < errorTestBest:
+      print('BEST', end=' ')
+    elif (errorTest == errorTestBest and errorTrainBest < errorTotal):
       errorTestBest = errorTest
+      errorTrainBest = errorTotal
+      if Option.saveModel is not None:
+        saver.save(sess, Option.saveModel)
+        print('S', end=' ')
       print('BEST', end=' ')
 
     print('')

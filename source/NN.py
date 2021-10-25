@@ -60,20 +60,23 @@ class NN(object):
     x = self.H[-1]
 
     with tf.compat.v1.variable_scope('Conv'):
-      x = self._conv(x, 5, 32, padding='VALID', name='conv0')
+      # need to figure out what all these methods do so that I can make this actual LeNet5
+      x = self._conv(x, 5, 6, padding='VALID', name='conv0')
       x = self._pool(x, 'MAX', 2, 2)
       x = self._activation(x)
 
-      x = self._conv(x, 5, 64, padding='VALID', name='conv1')
+      x = self._conv(x, 5, 8, padding='VALID', name='conv1')
       x = self._pool(x, 'MAX', 2, 2)
       x = self._activation(x)
 
     x = self._reshape(x)
 
     with tf.compat.v1.variable_scope('Fc'):
-      x = self._fc(x, 512, name='fc0')
+      x = self._fc(x, 120, name='fc0')
       x = self._activation(x)
-      x = self._fc(x, self.shapeY[1], name='fc1')
+      x = self._fc(x, 84, name='fc1')
+      x = self._activation(x)
+      x = self._fc(x, self.shapeY[1], name='fc2')
 
     x = self._QA(x)
     x = self._QE(x)

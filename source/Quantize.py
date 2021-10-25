@@ -32,6 +32,7 @@ def Q(x, bits):
   if bits > 15:
     return x
   elif bits == 1:  # BNN
+    # return old_div(tf.sign(x)+1,2)
     return tf.sign(x)
   else:
     SCALE = S(bits)

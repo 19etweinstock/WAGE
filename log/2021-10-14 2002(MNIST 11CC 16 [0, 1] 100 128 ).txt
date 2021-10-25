@@ -1,0 +1,113 @@
+2021-10-14 20:02:46 
+
+import time
+import tensorflow as tf
+
+tf.compat.v1.disable_eager_execution()
+tf.compat.v1.disable_v2_behavior()
+
+bitsW = 1  # bit width of weights
+bitsA = 1  # bit width of activations
+bitsG = 12  # bit width of gradients
+bitsE = 12 # bit width of errors
+
+bitsR = 16  # bit width of randomizer
+
+lr_schedule = [0,1]
+
+Epoch = 100
+
+batchSize = 128
+use_batch_norm = False
+
+dataSet = 'MNIST'  # 'MNIST','SVHN','CIFAR10', 'ILSVRC2012'
+
+def upper(str):
+    return str.upper()
+
+batch_text = 'batch norm' if use_batch_norm else ''
+
+Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
+Notes = f'{dataSet} {bitsW}{bitsA}{upper(hex(bitsG)[2:])}{upper(hex(bitsE)[2:])} {bitsR} {lr_schedule} {Epoch} {batchSize} {batch_text}'
+# Notes = 'lenet5 2888'
+# Notes = 'alexnet 28CC'
+
+GPU = [0]
+validNum = 0
+
+
+loadModel = None
+# loadModel = '../model/' + '2017-10-26' + '(' + 'vgg7 2888' + ')' + '.tf'
+# saveModel = None
+saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
+
+
+lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)
+# lr_schedule = [0, 8, 200, 1,250,1./8,300,0]
+# lr_schedule = [0, 32, 40, 32./8, 60, 32./64, 80, 0]
+L2 = 0
+
+lossFunc = 'SSE'
+# lossFunc = tf.losses.softmax_cross_entropy
+optimizer = tf.compat.v1.train.GradientDescentOptimizer(1)  # lr is controlled in Quantize.G
+
+# shared variables, defined by other files
+seed = None
+sess = None
+W_scale = []
+
+def upper(str):
+    return str.upper()
+
+W: /device:GPU:0 Conv/conv0/ [5, 5, 1, 6] Scale:4
+W: /device:GPU:0 Conv/conv1/ [5, 5, 6, 16] Scale:8
+W: /device:GPU:0 Fc/fc0/ [256, 120] Scale:16
+W: /device:GPU:0 Fc/fc1/ [120, 84] Scale:8
+W: /device:GPU:0 Fc/fc2/ [84, 10] Scale:8
+CONV: 2550 FC: 41640 Total: 44190
+W: /device:GPU:0 Conv_1/conv0/ [5, 5, 1, 6] Scale:4
+W: /device:GPU:0 Conv_1/conv1/ [5, 5, 6, 16] Scale:8
+W: /device:GPU:0 Fc_1/fc0/ [256, 120] Scale:16
+W: /device:GPU:0 Fc_1/fc1/ [120, 84] Scale:8
+W: /device:GPU:0 Fc_1/fc2/ [84, 10] Scale:8
+
+Optimization Start!
+
+lr: 0.000000 -> 1.000000
+Epoch: 000  Loss: 599.856838 Train: 0.2496 Test: 0.2550 FPS: 8057 
+Epoch: 001  Loss: 599.576923 Train: 0.2487 Test: 0.2550 FPS: 12284 
+Epoch: 002  Loss: 599.212607 Train: 0.2477 Test: 0.2550 FPS: 12150 
+Epoch: 003  Loss: 598.231838 Train: 0.2451 Test: 0.2451 FPS: 11928 S BEST 
+Epoch: 004  Loss: 592.629274 Train: 0.2577 Test: 0.2801 FPS: 10714 
+Epoch: 005  Loss: 587.384615 Train: 0.2746 Test: 0.3220 FPS: 10473 
+Epoch: 006  Loss: 591.114316 Train: 0.3439 Test: 0.3330 FPS: 11134 
+Epoch: 007  Loss: 590.536325 Train: 0.3742 Test: 0.3651 FPS: 11835 
+Epoch: 008  Loss: 593.641026 Train: 0.3968 Test: 0.3955 FPS: 11878 
+Epoch: 009  Loss: 589.647436 Train: 0.3908 Test: 0.3665 FPS: 11328 
+Epoch: 010  Loss: 586.629274 Train: 0.3767 Test: 0.3916 FPS: 11472 
+Epoch: 011  Loss: 592.294872 Train: 0.4068 Test: 0.4130 FPS: 11641 
+Epoch: 012  Loss: 594.553419 Train: 0.4230 Test: 0.4398 FPS: 11765 
+Epoch: 013  Loss: 592.756410 Train: 0.4209 Test: 0.3756 FPS: 11851 
+Epoch: 014  Loss: 595.102564 Train: 0.4786 Test: 0.5077 FPS: 11759 
+Epoch: 015  Loss: 579.545940 Train: 0.4384 Test: 0.4326 FPS: 11751 
+Epoch: 016  Loss: 590.325855 Train: 0.4998 Test: 0.5373 FPS: 11655 
+Epoch: 017  Loss: 582.251068 Train: 0.5106 Test: 0.4951 FPS: 11878 
+Epoch: 018  Loss: 577.001068 Train: 0.5376 Test: 0.4712 FPS: 11116 
+Epoch: 019  Loss: 579.076923 Train: 0.5512 Test: 0.6072 FPS: 11639 
+Epoch: 020  Loss: 565.568376 Train: 0.5270 Test: 0.5661 FPS: 11713 
+Epoch: 021  Loss: 540.232906 Train: 0.5392 Test: 0.6098 FPS: 11772 
+Epoch: 022  Loss: 519.639957 Train: 0.5957 Test: 0.5078 FPS: 11687 
+Epoch: 023  Loss: 491.340812 Train: 0.5601 Test: 0.4848 FPS: 11797 
+Epoch: 024  Loss: 495.168803 Train: 0.4646 Test: 0.5165 FPS: 11589 
+Epoch: 025  Loss: 512.581197 Train: 0.4649 Test: 0.5058 FPS: 11656 
+Epoch: 026  Loss: 453.850427 Train: 0.5124 Test: 0.5932 FPS: 11728 
+Epoch: 027  Loss: 409.752137 Train: 0.3528 Test: 0.2401 FPS: 11668 S BEST 
+Epoch: 028  Loss: 322.635684 Train: 0.2051 Test: 0.1779 FPS: 10614 S BEST 
+Epoch: 029  Loss: 228.145299 Train: 0.1009 Test: 0.0477 FPS: 10716 S BEST 
+Epoch: 030  Loss: 114.892094 Train: 0.0443 Test: 0.0388 FPS: 10379 S BEST 
+Epoch: 031  Loss: 126.748932 Train: 0.0691 Test: 0.0555 FPS: 10914 
+Epoch: 032  Loss: 122.572650 Train: 0.0518 Test: 0.0326 FPS: 11247 S BEST 
+Epoch: 033  Loss: nan Train: 0.7291 Test: 1.0000 FPS: 10886 
+Epoch: 034  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11272 
+Epoch: 035  Loss: nan Train: 1.0000 Test: 1.0000 FPS: 11630 
+Epoch: 036  

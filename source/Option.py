@@ -6,12 +6,12 @@ tf.compat.v1.disable_v2_behavior()
 
 bitsW = 1  # bit width of weights
 bitsA = 1  # bit width of activations
-bitsG = 12  # bit width of gradients
-bitsE = 12 # bit width of errors
+bitsG = 13  # bit width of gradients
+bitsE = 13 # bit width of errors
 
 bitsR = 16  # bit width of randomizer
 
-lr_schedule = [0,1]
+lr_schedule = [0,1.1]
 
 Epoch = 100
 
