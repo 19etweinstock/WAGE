@@ -16,26 +16,52 @@ def main():
     sess = tf.compat.v1.InteractiveSession(config=config)
 
     saver = tf.compat.v1.train.import_meta_graph('../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf.meta')
-    saver.restore(sess,tf.compat.v1.train.latest_checkpoint('../model/'))
+    saver.restore(sess,tf.compat.v1.train.latest_checkpoint('../model/./'))
 
     graph = tf.compat.v1.get_default_graph() 
     vars = graph.get_collection('variables') 
 
-    f = open("weights.py", "wt")
+    f = open("Weights.py", "wt")
     f.write("import numpy as np\n\n")
+    f.flush()
     
-    tensor=vars[2].value()
+    for var in range(3,5):
+        tensor=vars[var].value()
+        for in_filter in range(0, tensor.shape.as_list()[2]):
+            for out_filter in range(0,tensor.shape.as_list()[3]):
+                f.write(f"conv{var-3}_in{in_filter}_out{out_filter} = np.array([\n")
+                quant = Quantize.W(tensor)
+                for row in range(0,5):
+                    f.write("\t[")
+                    for col in range(0,5):
+                        f.write(f"{quant[row,col,in_filter,out_filter].eval()}{', ' if col != 4 else ''}")
+                    f.write("]")
+                    if (row != 4):
+                        f.write(",\n")
+                    f.flush()
+                    
+                f.write("])\n\n")
+                f.flush()
 
-    for filter in range(0,6):
-        f.write(f"conv_filter_{filter} = np.array([[\n")
-        for row in range(0,5):
+    for var in range(5,8):
+        tensor=vars[var].value()
+        quant = Quantize.W(tensor)
+        f.write(f"fc{var-5} = np.array([\n")
+        rows=tensor.shape.as_list()[0]
+        cols=tensor.shape.as_list()[1]
+        for row in range(0,rows):
             f.write("\t[")
-            for col in range(0,5):
-                f.write(f"[{Quantize.W(tensor[row,col,0,filter].eval())}]{', ' if col != 4 else ''}")
-            f.write("],")
-            if (row != 4):
-                f.write("\n")
-        f.write(" ]])\n\n")
+            for col in range(0, cols):
+                f.write(f"{quant[row,col].eval()}{', ' if col != (cols-1) else ''}")
+            f.write("]")
+            if (row != (rows -1)):
+                f.write(",\n")
+            f.flush()
+            
+        f.write("])\n\n")
+        f.flush()
+            
+    f.close()
 
 
 if __name__ == '__main__':
