@@ -122,12 +122,12 @@ def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
     # index = int(sys.argv[1])
-    index = 1
+    index = 8
 
     image = testX[index,:,:,0]
     answer = getAnswer(testY[index])
 
-    result = runNetwork(activate(image))
+    result = runNetwork(activate(image/256.))
 
     print(testY[index])
     print(result)

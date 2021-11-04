@@ -1,3 +1,5 @@
+2021-11-01 14:39:17 
+
 import time
 import tensorflow as tf
 
@@ -58,3 +60,20 @@ W_scale = []
 
 def upper(str):
     return str.upper()
+
+W: /device:GPU:0 Conv/conv0/ [5, 5, 1, 6] Scale:4
+W: /device:GPU:0 Conv/conv1/ [5, 5, 6, 8] Scale:8
+W: /device:GPU:0 Fc/fc0/ [128, 120] Scale:8
+W: /device:GPU:0 Fc/fc1/ [120, 84] Scale:8
+W: /device:GPU:0 Fc/fc2/ [84, 10] Scale:8
+CONV: 1350 FC: 26280 Total: 27630
+W: /device:GPU:0 Conv_1/conv0/ [5, 5, 1, 6] Scale:4
+W: /device:GPU:0 Conv_1/conv1/ [5, 5, 6, 8] Scale:8
+W: /device:GPU:0 Fc_1/fc0/ [128, 120] Scale:8
+W: /device:GPU:0 Fc_1/fc1/ [120, 84] Scale:8
+W: /device:GPU:0 Fc_1/fc2/ [84, 10] Scale:8
+Loading model from ../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf ... Finished Test: 0.0120 
+
+Optimization Start!
+
+lr: 1.100000 -> 1.100000
