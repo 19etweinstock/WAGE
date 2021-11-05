@@ -21,7 +21,7 @@ def main():
     graph = tf.compat.v1.get_default_graph() 
     vars = graph.get_collection('variables') 
 
-    f = open("Weights.py", "wt")
+    f = open("weights.py", "wt")
     f.write("import numpy as np\n\n")
     f.flush()
     
@@ -39,11 +39,25 @@ def main():
                     f.write("]")
                     if (row != 4):
                         f.write(",\n")
-                    # f.flush()
                     
                 f.write("])\n\n")
                 f.flush()
-
+        for out_filter in range(0, tensor.shape.as_list()[3]):
+            f.write(f"weights_conv{var-3}_out{out_filter} = np.array([\n")
+            for in_filter in range(0, tensor.shape.as_list()[2]):
+                f.write(f"\tconv{var-3}_in{in_filter}_out{out_filter}")
+                if (in_filter != tensor.shape.as_list()[2] - 1):
+                    f.write(",\n")
+                else:
+                    f.write("])\n\n")
+        
+        f.write(f"weights_conv{var-3} = np.array([\n")
+        for out_filter in range(0, tensor.shape.as_list()[3]):
+            f.write(f"\tweights_conv{var-3}_out{out_filter}")
+            if (out_filter != tensor.shape.as_list()[3] - 1):
+                f.write(",\n")
+            else:
+                f.write("])\n\n")
     for var in range(5,8):
         tensor=vars[var].value()
         quant = Quantize.W(tensor)
@@ -58,7 +72,6 @@ def main():
             f.write("]")
             if (row != (rows -1)):
                 f.write(",\n")
-            # f.flush()
             
         f.write("])\n\n")
         f.flush()

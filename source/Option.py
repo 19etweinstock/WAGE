@@ -34,12 +34,10 @@ GPU = [0]
 validNum = 0
 
 
-# loadModel = None
-
-
-loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
-saveModel = None
-# saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
+loadModel = None
+# loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
+# saveModel = None
+saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
 
 
 lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)

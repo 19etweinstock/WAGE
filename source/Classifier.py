@@ -2,7 +2,7 @@ import os
 # from numpy.core.defchararray import array
 
 # from tensorflow.python.ops.gen_array_ops import reshape
-import weights
+import weights as weights
 
 import sys
 
@@ -71,66 +71,58 @@ def getAnswer(label):
             return i
 
 def runNetwork(image):
-    feature_map_0 = activate(pool(conv2D(image, weights.conv0_in0_out0)))
-    feature_map_1 = activate(pool(conv2D(image, weights.conv0_in0_out1)))
-    feature_map_2 = activate(pool(conv2D(image, weights.conv0_in0_out2)))
-    feature_map_3 = activate(pool(conv2D(image, weights.conv0_in0_out3)))
-    feature_map_4 = activate(pool(conv2D(image, weights.conv0_in0_out4)))
-    feature_map_5 = activate(pool(conv2D(image, weights.conv0_in0_out5)))
 
-    inputs_maps=np.array([feature_map_0, feature_map_1, feature_map_2, feature_map_3, feature_map_4, feature_map_5])
-    weights0=np.array([weights.conv1_in0_out0, weights.conv1_in1_out0, weights.conv1_in2_out0, weights.conv1_in3_out0, weights.conv1_in4_out0, weights.conv1_in5_out0])
-    weights1=np.array([weights.conv1_in0_out1, weights.conv1_in1_out1, weights.conv1_in2_out1, weights.conv1_in3_out1, weights.conv1_in4_out1, weights.conv1_in5_out1])
-    weights2=np.array([weights.conv1_in0_out2, weights.conv1_in1_out2, weights.conv1_in2_out2, weights.conv1_in3_out2, weights.conv1_in4_out2, weights.conv1_in5_out2])
-    weights3=np.array([weights.conv1_in0_out3, weights.conv1_in1_out3, weights.conv1_in2_out3, weights.conv1_in3_out3, weights.conv1_in4_out3, weights.conv1_in5_out3])
-    weights4=np.array([weights.conv1_in0_out4, weights.conv1_in1_out4, weights.conv1_in2_out4, weights.conv1_in3_out4, weights.conv1_in4_out4, weights.conv1_in5_out4])
-    weights5=np.array([weights.conv1_in0_out5, weights.conv1_in1_out5, weights.conv1_in2_out5, weights.conv1_in3_out5, weights.conv1_in4_out5, weights.conv1_in5_out5])
-    weights6=np.array([weights.conv1_in0_out6, weights.conv1_in1_out6, weights.conv1_in2_out6, weights.conv1_in3_out6, weights.conv1_in4_out6, weights.conv1_in5_out6])
-    weights7=np.array([weights.conv1_in0_out7, weights.conv1_in1_out7, weights.conv1_in2_out7, weights.conv1_in3_out7, weights.conv1_in4_out7, weights.conv1_in5_out7])
-    weights_conv1=np.array([weights0,weights1,weights2,weights3,weights4,weights5,weights6,weights7])
+    image = activate(image)
+    feature_maps_layer0 = weights.weights_conv0.shape[0]
+    feature_maps_layer1 = weights.weights_conv1.shape[0]
 
-    output_maps=np.zeros([8,8,8])
-    
-    for i in range(0,8):
-        weight = weights_conv1[i]
-        for j in range(0,6):
-            output_maps[i] = output_maps[i] + conv2D(inputs_maps[j], weight[j])
+    feature_map_conv0 = np.zeros([feature_maps_layer0,12,12])
+    feature_map_conv1 = np.zeros([feature_maps_layer1,8,8])
 
-    feature_map_fc_0 = np.reshape(activate(pool(output_maps[0])),[16])
-    feature_map_fc_1 = np.reshape(activate(pool(output_maps[1])),[16])
-    feature_map_fc_2 = np.reshape(activate(pool(output_maps[2])),[16])
-    feature_map_fc_3 = np.reshape(activate(pool(output_maps[3])),[16])
-    feature_map_fc_4 = np.reshape(activate(pool(output_maps[4])),[16])
-    feature_map_fc_5 = np.reshape(activate(pool(output_maps[5])),[16])
-    feature_map_fc_6 = np.reshape(activate(pool(output_maps[6])),[16])
-    feature_map_fc_7 = np.reshape(activate(pool(output_maps[7])),[16])
+    for i in range(0, feature_maps_layer0):
+        feature_map_conv0[i, :, :] = activate(pool(conv2D(image, weights.weights_conv0[i, 0, :, :])))
 
-    x = np.reshape(np.array([feature_map_fc_0,feature_map_fc_1,feature_map_fc_2,feature_map_fc_3,
-                            feature_map_fc_4,feature_map_fc_5,feature_map_fc_6,feature_map_fc_7]), [128])
+    for i in range(0, feature_maps_layer1):
+        for j in range(0, feature_maps_layer0):
+            feature_map_conv1[i, :, :] += conv2D(feature_map_conv0[j,:,:], weights.weights_conv1[i, j, :, :])
 
-    x = np.matmul(np.transpose(weights.fc0),x)
+    x = np.zeros([16*feature_maps_layer1])
+
+    for i in range(0, feature_maps_layer1):
+        x[i*16:i*16+16] = np.reshape(activate(pool(feature_map_conv1[i,:,:])), [16])
+
+    x = np.matmul(x,weights.fc0)
     x = activate(x)
-    x = np.matmul(np.transpose(weights.fc1),x)
-    # x = np.matmul(x,weights.fc1)
+    x = np.matmul(x,weights.fc1)
     x = activate(x)
-    x = np.matmul(np.transpose(weights.fc2),x)
-    # x = np.matmul(x,weights.fc2)
+    x = np.matmul(x,weights.fc2)
 
     return x
 
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    # index = int(sys.argv[1])
-    index = 8
+    data = testX
+    answers = testY
 
-    image = testX[index,:,:,0]
-    answer = getAnswer(testY[index])
+    for index in range(0, data.shape[0]):
 
-    result = runNetwork(activate(image/256.))
+        # index = int(sys.argv[1])
+        # index = 8
 
-    print(testY[index])
-    print(result)
+        image = data[index,:,:,0]
+        answer = getAnswer(answers[index])
+
+        result = runNetwork(image)
+
+        # print(testY[index])
+        # print(result)
+
+        # process result
+        max = np.max(result)
+        check = result == max
+        if (np.sum(check) == 1 and check[answer] == 1):
+            print(index)
 
 
 
