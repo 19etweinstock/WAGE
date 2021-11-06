@@ -1,0 +1,93 @@
+2021-11-05 14:52:16 
+
+import time
+import tensorflow as tf
+
+tf.compat.v1.disable_eager_execution()
+tf.compat.v1.disable_v2_behavior()
+
+bitsW = 1  # bit width of weights
+bitsA = 1  # bit width of activations
+bitsG = 13  # bit width of gradients
+bitsE = 13 # bit width of errors
+
+bitsR = 16  # bit width of randomizer
+
+lr_schedule = [0,1.1]
+
+Epoch = 100
+
+batchSize = 128
+use_batch_norm = False
+
+dataSet = 'MNIST'  # 'MNIST','SVHN','CIFAR10', 'ILSVRC2012'
+
+def upper(str):
+    return str.upper()
+
+batch_text = 'batch norm' if use_batch_norm else ''
+
+Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
+Notes = f'{dataSet} {bitsW}{bitsA}{upper(hex(bitsG)[2:])}{upper(hex(bitsE)[2:])} {bitsR} {lr_schedule} {Epoch} {batchSize} {batch_text}'
+# Notes = 'lenet5 2888'
+# Notes = 'alexnet 28CC'
+
+GPU = [0]
+validNum = 0
+
+
+loadModel = None
+# loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
+# saveModel = None
+saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
+
+
+lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)
+# lr_schedule = [0, 8, 200, 1,250,1./8,300,0]
+# lr_schedule = [0, 32, 40, 32./8, 60, 32./64, 80, 0]
+L2 = 0
+
+lossFunc = 'SSE'
+# lossFunc = tf.losses.softmax_cross_entropy
+optimizer = tf.compat.v1.train.GradientDescentOptimizer(1)  # lr is controlled in Quantize.G
+
+# shared variables, defined by other files
+seed = None
+sess = None
+W_scale = []
+
+def upper(str):
+    return str.upper()
+
+W: /device:GPU:0 Conv/conv0/ [5, 5, 1, 6] Scale:4
+W: /device:GPU:0 Conv/conv1/ [5, 5, 6, 8] Scale:8
+W: /device:GPU:0 Fc/fc0/ [128, 120] Scale:8
+W: /device:GPU:0 Fc/fc1/ [120, 84] Scale:8
+W: /device:GPU:0 Fc/fc2/ [84, 10] Scale:8
+CONV: 1350 FC: 26280 Total: 27630
+W: /device:GPU:0 Conv_1/conv0/ [5, 5, 1, 6] Scale:4
+W: /device:GPU:0 Conv_1/conv1/ [5, 5, 6, 8] Scale:8
+W: /device:GPU:0 Fc_1/fc0/ [128, 120] Scale:8
+W: /device:GPU:0 Fc_1/fc1/ [120, 84] Scale:8
+W: /device:GPU:0 Fc_1/fc2/ [84, 10] Scale:8
+
+Optimization Start!
+
+lr: 0.000000 -> 1.100000
+Epoch: 000  Loss: 650.298077 Train: 0.4738 Test: 0.4773 FPS: 7974 
+Epoch: 001  Loss: 651.228632 Train: 0.4739 Test: 0.4773 FPS: 12740 S BEST 
+Epoch: 002  Loss: 650.523504 Train: 0.4734 Test: 0.4773 FPS: 11336 
+Epoch: 003  Loss: 650.159188 Train: 0.4728 Test: 0.4773 FPS: 11314 
+Epoch: 004  Loss: 651.648504 Train: 0.4770 Test: 0.4773 FPS: 11742 S BEST 
+Epoch: 005  Loss: 650.524573 Train: 0.4741 Test: 0.4773 FPS: 11149 
+Epoch: 006  Loss: 650.692308 Train: 0.4746 Test: 0.4773 FPS: 11724 
+Epoch: 007  Loss: 645.842949 Train: 0.4789 Test: 0.5059 FPS: 11889 
+Epoch: 008  Loss: 653.943376 Train: 0.5098 Test: 0.5044 FPS: 12133 
+Epoch: 009  Loss: 649.552350 Train: 0.5025 Test: 0.4506 FPS: 12049 S BEST 
+Epoch: 010  Loss: 618.510684 Train: 0.4401 Test: 0.4603 FPS: 11242 
+Epoch: 011  Loss: 618.934829 Train: 0.4969 Test: 0.5123 FPS: 11594 
+Epoch: 012  Loss: 612.840812 Train: 0.5234 Test: 0.5386 FPS: 11881 
+Epoch: 013  Loss: 607.430556 Train: 0.5256 Test: 0.5051 FPS: 11904 
+Epoch: 014  Loss: 594.762821 Train: 0.5146 Test: 0.5060 FPS: 11858 
+Epoch: 015  Loss: 594.360043 Train: 0.5166 Test: 0.4884 FPS: 11712 
+Epoch: 016  
