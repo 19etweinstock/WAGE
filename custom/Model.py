@@ -28,7 +28,8 @@ class lenet5(tf.keras.Model):
         self.QE = Layers.QE
 
     def call(self, input, training=False):
-        x = self.conv0(input)
+        x = Layers.Quantize.A(input)
+        x = self.conv0(x)
         x = self.pool0(x)
         x = self.activation0(x)
 
