@@ -5,7 +5,7 @@ import tensorflow as tf
 
 import Layers
 
-class Lenet5(tf.keras.Model):
+class lenet5(tf.keras.Model):
     def __init__(self) -> None:
         super().__init__()
         self.conv0 = Layers.qconv2d(5, 6, name='conv0')

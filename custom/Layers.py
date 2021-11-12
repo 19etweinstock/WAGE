@@ -6,7 +6,7 @@ import tensorflow as tf
 import Quantize
 from functools import reduce
 
-def stride(_stride):
+def _arr(_stride):
     return [1, 1, _stride, _stride]
 
 def QE(x):
@@ -20,7 +20,7 @@ def QA(x):
     return x
 
 class qconv2d(tf.keras.layers.Layer):
-    def __init__(self, ksize, c_out, stride=1, padding='SAME',name='conv'):
+    def __init__(self, ksize, c_out, stride=1, padding='VALID',name='conv'):
         super().__init__()
         self.ksize = ksize
         self.c_out = c_out
@@ -36,24 +36,24 @@ class qconv2d(tf.keras.layers.Layer):
     def call(self, inputs):
         return tf.nn.conv2d(input=inputs, \
                             filters=Quantize.W(self.kernel), \
-                            strides=stride(self.stride), \
+                            strides=_arr(self.stride), \
                             padding=self.padding, \
                             data_format='NCHW', \
                             name=self.named)
 
 class maxpool(tf.keras.layers.Layer):
-    def __init__(self, ksize=2, stride=1, padding='VALID'):
+    def __init__(self, ksize=2, stride=2, padding='SAME'):
         super().__init__()
         self.ksize = ksize
         self.stride = stride
         self.padding = padding
 
     def call(self, inputs):
-        return tf.nn.max_pool(  input=inputs,\
-                                ksize=self.ksize, \
-                                strides=stride(self.stride), \
-                                padding=self.padding, \
-                                data_format='NCHW')
+        return tf.nn.max_pool(  inputs,\
+                                _arr(self.ksize), \
+                                _arr(self.stride), \
+                                self.padding, \
+                                'NCHW')
 
 class qactivation(tf.keras.layers.Layer):
     def __init__(self):
@@ -66,7 +66,7 @@ class qactivation(tf.keras.layers.Layer):
         return x
 
 class qfc(tf.keras.layers.Layer):
-    def __init__(self, c_out, name) -> None:
+    def __init__(self, c_out, name='fc') -> None:
         super().__init__()
         self.c_out = c_out
         self.named = name
@@ -85,4 +85,4 @@ class reshape(tf.keras.layers.Layer):
     
     def call(self, inputs):
         shape = reduce(lambda inputs, y: inputs * y, inputs.get_shape().as_list()[1:])
-        x = tf.reshape(inputs, [-1, shape])
+        return tf.reshape(inputs, [-1, shape])
