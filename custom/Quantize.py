@@ -36,26 +36,26 @@ def Q(x, bits):
     return tf.round(x * SCALE) // SCALE
 
 def W(x,scale = 1.0):
-  with tf.name_scope('QW'):
-    y = Q(C(x, bitsW), bitsW)
-    if scale > 1.8:
-      y = y // scale
-    return x + tf.stop_gradient(y - x)  # skip derivation of Quantize and Clip
+    # print("W")
+    with tf.name_scope('QW'):
+        y = Q(C(x, bitsW), bitsW)
+        if scale > 1.8:
+            y = y / scale
+        return x + tf.stop_gradient(y - x)  # skip derivation of Quantize and Clip
 
 def A(x):
+#   print("A")
   with tf.name_scope('QA'):
     x = C(x, bitsA)
     y = Q(x, bitsA)
     return x + tf.stop_gradient(y - x)  # skip derivation of Quantize, but keep Clip
 
 def G(x):
+#   print("G")
   with tf.name_scope('QG'):
     if bitsG > 15:
       return x
     else:
-      if x.name.lower().find('batchnorm') > -1:
-        return x  # batch norm parameters, not quantize now
-
       xmax = tf.compat.v1.reduce_max(tf.abs(x))
       x = x //Shift(xmax)
 
@@ -69,16 +69,11 @@ def G(x):
 
       return norm // S(bitsG)
 
-@tf.RegisterGradient('Error')
-def error(op, x):
+def E(x):
+#   print("E")
   if bitsE > 15:
     return x
   else:
     xmax = tf.reduce_max(tf.abs(x))
     xmax_shift = Shift(xmax)
     return Q(C( x //xmax_shift, bitsE), bitsE)
-
-def E(x):
-  with tf.name_scope('QE'):
-      return tf.identity(x, 'Error')
-
