@@ -74,7 +74,7 @@ def runNetwork(image):
 
     image = activate(image)
     feature_maps_layer0 = weights.weights_conv0.shape[0]
-    feature_maps_layer1 = weights.weights_conv2.shape[0]
+    feature_maps_layer1 = weights.weights_conv1.shape[0]
 
     feature_map_conv0 = np.zeros([feature_maps_layer0,12,12])
     feature_map_conv1 = np.zeros([feature_maps_layer1,8,8])
@@ -102,8 +102,8 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = testX
-    answers = testY
+    data = testX[0:1000,:,:]
+    answers = testY[0:1000,:]
 
     i = 0
     for index in range(0, data.shape[0]):

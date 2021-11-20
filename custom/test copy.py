@@ -4,6 +4,8 @@ import tensorflow as tf
 import numpy as np
 import GetData
 import Quantize
+import Log
+import time
 # mnist = tf.keras.datasets.mnist
 # (x_train, y_train),(x_test, y_test) = mnist.load_data()
 # x_train, x_test = x_train / 255.0, x_test / 255.0
@@ -11,6 +13,11 @@ import Quantize
 # x_test = np.expand_dims(x_test, 1)
 # y_train = tf.one_hot(y_train, 10)
 # y_test = tf.one_hot(y_test, 10)
+
+Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
+pathLog = '../log/' + Time + '.txt'
+# Log.Log(pathLog, 'w+', 1) # set log file
+# print(time.strftime('%Y-%m-%d %X', time.localtime()), '\n')
 
 with tf.device('/cpu:0'):
   x_train,y_train,x_test,y_test,_ =\
@@ -22,20 +29,23 @@ x_test = tf.cast(tf.transpose(x_test, [0,3,1,2]),dtype=tf.float32)
 y_train = tf.constant(y_train / 1.0,dtype=tf.float32)
 y_test = tf.constant(y_test / 1.0,dtype=tf.float32)
 
+class quant(tf.keras.constraints.Constraint):
+    def __call__(self, w):
+        return Quantize.W(w)
 
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(6,5, padding='valid', data_format='channels_first', use_bias=False),
+    tf.keras.layers.Conv2D(32,5, padding='valid', data_format='channels_first', use_bias=False, kernel_constraint=quant()),
     tf.keras.layers.MaxPool2D(strides=(2,2), data_format='channels_first'),
     tf.keras.layers.ReLU(),
-    tf.keras.layers.Conv2D(8,5, padding='valid', data_format='channels_first', use_bias=False),
+    tf.keras.layers.Conv2D(64,5, padding='valid', data_format='channels_first', use_bias=False, kernel_constraint=quant()),
     tf.keras.layers.MaxPool2D(strides=(2,2), data_format='channels_first'),
     tf.keras.layers.ReLU(),
     tf.keras.layers.Reshape((-1,)),
-    tf.keras.layers.Dense(120, use_bias=False),
+    tf.keras.layers.Dense(120, use_bias=False, kernel_constraint=quant()),
     tf.keras.layers.ReLU(),
-    tf.keras.layers.Dense(84, use_bias=False),
+    tf.keras.layers.Dense(84, use_bias=False, kernel_constraint=quant()),
     tf.keras.layers.ReLU(),
-    tf.keras.layers.Dense(10, use_bias=False),
+    tf.keras.layers.Dense(10, use_bias=False, kernel_constraint=quant()),
 ])
 
 
@@ -43,24 +53,24 @@ model = tf.keras.models.Sequential([
 
 # model = Model.lenet5()
 
-# def lossf(y_true, y_pred):
-#   return 0.5 * tf.reduce_sum(tf.square(y_true - y_pred))
+def lossf(y_true, y_pred):
+  return 0.5 * tf.reduce_sum(tf.square(y_true - y_pred))
 model.compile(optimizer=tf.keras.optimizers.SGD(\
               learning_rate=1.0),
-              loss='mse',
+              loss=lossf,
               metrics=['accuracy'],
               run_eagerly=False)
 
-model.fit(x_train, y_train, epochs=15,batch_size=32)
+model.fit(x_train, y_train, epochs=100,batch_size=128)
 model.evaluate(x_test, y_test)
 
 vars = model.variables
 
-f = open("weights_not_WAGE.py", "wt")
+f = open(f"weights_{Time}.py", "wt")
 f.write("import numpy as np\n\n")
 f.flush()
 
-for var in [0,2]:
+for var in range(0,2):
     tensor=vars[var].value()
     for in_filter in range(0, tensor.shape.as_list()[2]):
         for out_filter in range(0,tensor.shape.as_list()[3]):
@@ -93,7 +103,7 @@ for var in [0,2]:
             f.write(",\n")
         else:
             f.write("])\n\n")
-for var in [4,6,8]:
+for var in range(2,5):
     tensor=vars[var].value()
     quant = Quantize.W(tensor)
     quant_array = quant.numpy()

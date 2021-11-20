@@ -33,7 +33,7 @@ def Q(x, bits):
     return tf.sign(x)
   else:
     SCALE = S(bits)
-    return tf.round(x * SCALE) // SCALE
+    return tf.round(x * SCALE) / SCALE
 
 def W(x,scale = 1.0):
     # print("W")
@@ -56,24 +56,27 @@ def G(x):
     if bitsG > 15:
       return x
     else:
-      xmax = tf.compat.v1.reduce_max(tf.abs(x))
-      x = x //Shift(xmax)
+      xmax = tf.reduce_max(tf.abs(x))
+      x = x / Shift(xmax)
 
       norm = Q(LR * x , bitsR)
       norm_sign = tf.sign(norm)
       norm_abs = tf.abs(norm)
       norm_int = tf.floor(norm_abs)
       norm_float = norm_abs - norm_int
-      rand_float = tf.compat.v1.random_uniform(x.get_shape(), 0, 1)
+      rand_float = tf.random.uniform(x.shape, 0, 1)
       norm = norm_sign * ( norm_int + 0.5 * (tf.sign(norm_float - rand_float) + 1) )
 
-      return norm // S(bitsG)
+      return norm / S(bitsG)
 
+@tf.custom_gradient
 def E(x):
-#   print("E")
-  if bitsE > 15:
-    return x
-  else:
-    xmax = tf.reduce_max(tf.abs(x))
-    xmax_shift = Shift(xmax)
-    return Q(C( x //xmax_shift, bitsE), bitsE)
+  with tf.name_scope('QE'):
+    def grad(dy):
+      if bitsE > 15:
+        return dy
+      else:
+        xmax = tf.reduce_max(tf.abs(dy))
+        xmax_shift = Shift(xmax)
+        return Q(C( x /xmax_shift, bitsE), bitsE)
+    return x, grad

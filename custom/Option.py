@@ -6,8 +6,8 @@ import tensorflow as tf
 
 bitsW = 1  # bit width of weights
 bitsA = 1  # bit width of activations
-bitsG = 13  # bit width of gradients
-bitsE = 13 # bit width of errors
+bitsG = 15  # bit width of gradients
+bitsE = 15 # bit width of errors
 
 bitsR = 16  # bit width of randomizer
 

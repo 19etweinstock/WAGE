@@ -9,10 +9,15 @@ from functools import reduce
 
 def _arr(_stride):
     return [1, 1, _stride, _stride]
+
+def QE(x):
+    if Quantize.bitsE <= 16:
+        x = Quantize.E(x)
+    return x
     
 def QA(x):
-    # if Quantize.bitsA <= 16:
-    #     x = Quantize.A(x)
+    if Quantize.bitsA <= 16:
+        x = Quantize.A(x)
     return x
 
 class qconv2d(tf.keras.layers.Layer):
@@ -32,9 +37,7 @@ class qconv2d(tf.keras.layers.Layer):
                                       dtype=tf.float32)
 
     def call(self, inputs):
-        # self.input_array=inputs
-        # weights = Quantize.W(self.kernel)
-        weights = self.kernel
+        weights = Quantize.W(self.kernel)
         return tf.nn.conv2d(input=inputs, \
                             filters=weights, \
                             strides=_arr(self.stride), \
@@ -50,7 +53,6 @@ class maxpool(tf.keras.layers.Layer):
         self.padding = padding
 
     def call(self, inputs):
-        # self.input_array=inputs
         return tf.nn.max_pool(  inputs,\
                                 _arr(self.ksize), \
                                 _arr(self.stride), \
@@ -62,9 +64,9 @@ class qactivation(tf.keras.layers.Layer):
         super().__init__()
 
     def call(self, inputs):
-        # self.input_array=inputs
         x = tf.nn.relu(inputs)
-        # x = QA(x)
+        x = QE(x)
+        x = QA(x)
         return x
 
 class qfc(tf.keras.layers.Layer):
@@ -82,9 +84,8 @@ class qfc(tf.keras.layers.Layer):
     
     def call(self, inputs):
         # self.input_array=inputs
-        # weights = Quantize.W(self.kernel)
-        weights = self.kernel
-
+        weights = Quantize.W(self.kernel)
+        # weights = self.kernel
         return tf.matmul(inputs, weights)
 
 class reshape(tf.keras.layers.Layer):
