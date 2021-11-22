@@ -6,6 +6,8 @@ import numpy as np
 import GetData
 import Quantize
 import time
+import Option
+import Log
 
 mnist = tf.keras.datasets.mnist
 (x_train, y_train),(x_test, y_test) = mnist.load_data()
@@ -26,18 +28,36 @@ y_test = tf.one_hot(y_test, 10)
 # y_test = tf.constant(y_test / 1.0,dtype=tf.float32)
 import Model
 
+Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
+
+def upper(str):
+    return str.upper()
+
+Notes = f'MNIST {Option.bitsW}{Option.bitsA}{upper(hex(Option.bitsG)[2:])}{upper(hex(Option.bitsE)[2:])} {Option.bitsR} {Option.lr_schedule} {Option.Epoch} {Option.batchSize}'
+
+pathLog = '../log/' + Time + '(' + Notes + ')' + '.txt'
+log = Log.Log(pathLog, 'wt', 1) # set log file
+setattr(Log, 'isatty', True)
+print(Time)
+print(open('Option.py').read())
+
+
 model = Model.lenet5(6,8)
 
+lr = [[],[Option.lr_schedule[1]]]
+
+for i in range (0, len(Option.lr_schedule), 2):
+    lr[0].append(Option.lr_schedule[i])
+    lr[1].append(Option.lr_schedule[i+1])
+
+
 model.compile(optimizer=tf.keras.optimizers.SGD(\
-              learning_rate=tf.keras.optimizers.schedules.PiecewiseConstantDecay([100], [1.1, 1.1])),
+              learning_rate=tf.keras.optimizers.schedules.PiecewiseConstantDecay(lr[0], lr[1])),
               loss='mse',
               metrics=['accuracy'],
               run_eagerly=False)
 
-print(f'W: {Quantize.bitsW}\nA: {Quantize.bitsA}\nG: {Quantize.bitsG}\nE: {Quantize.bitsE}\n')
-
-
-model.fit(x_train, y_train, epochs=100,batch_size=128)
+model.fit(x_train, y_train, epochs=Option.Epoch,batch_size=Option.batchSize)
 result=model.evaluate(x_test, y_test)
 
 vars = model.variables
@@ -49,7 +69,9 @@ Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
 
 
 f = open(f'../weights/{result[1]} {Time} {Quantize.bitsW}{Quantize.bitsA}{upper(hex(Quantize.bitsG)[2:])}{upper(hex(Quantize.bitsE)[2:])} {Quantize.bitsR}.py', "wt")
-f.write("import numpy as np\n\n")
+f.write(f'#W: {Quantize.bitsW}\n#A: {Quantize.bitsA}\n#G: {Quantize.bitsG}\n#E: {Quantize.bitsE}\n')
+f.write("\nimport numpy as np\n\n")
+
 f.flush()
 
 for var in range(0,2):
@@ -57,7 +79,7 @@ for var in range(0,2):
     for in_filter in range(0, tensor.shape.as_list()[2]):
         for out_filter in range(0,tensor.shape.as_list()[3]):
             f.write(f"conv{var}_in{in_filter}_out{out_filter} = np.array([\n")
-            quant = Quantize.W(tensor)
+            quant = Quantize.W(tensor, Quantize.W_scale[var])
             quant_array = quant.numpy()
             for row in range(0,5):
                 f.write("\t[")
@@ -87,7 +109,7 @@ for var in range(0,2):
             f.write("])\n\n")
 for var in range(2,5):
     tensor=vars[var].value()
-    quant = Quantize.W(tensor)
+    quant = Quantize.W(tensor, Quantize.W_scale[var])
     quant_array = quant.numpy()
     f.write(f"fc{var-2} = np.array([\n")
     rows=tensor.shape.as_list()[0]

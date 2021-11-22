@@ -5,25 +5,26 @@ import tensorflow as tf
 import Layers, Quantize
 
 class lenet5(tf.keras.Model):
-    def __init__(self, fmaps0=32, fmaps1=64) -> None:
+    def __init__(self, fmaps0=32, fmaps1=64, _fc0 = 120, _fc1 = 84) -> None:
         super().__init__()
-        self.conv0 = Layers.qconv2d(5, fmaps0, 0, name='conv0')
+        self.conv0 = Layers.qconv2d(5, fmaps0, name='conv0')
         self.pool0 = Layers.maxpool()
         self.activation0 = Layers.qactivation()
 
-        self.conv1 = Layers.qconv2d(5, fmaps1, 1, name='conv1')
+        self.conv1 = Layers.qconv2d(5, fmaps1, name='conv1')
         self.pool1 = Layers.maxpool()
         self.activation1 = Layers.qactivation()
 
         self.reshape=Layers.reshape()
 
-        self.fc0 = Layers.qfc(120, 2, 'fc0')
+        self.fc0 = Layers.qfc(_fc0, 'fc0')
         self.activation2 = Layers.qactivation()
-        self.fc1 = Layers.qfc(84, 3, 'fc1')
+        self.fc1 = Layers.qfc(_fc1, 'fc1')
         self.activation3 = Layers.qactivation()
-        self.fc2 = Layers.qfc(10, 4, 'fc2')
+        self.fc2 = Layers.qfc(10, 'fc2')
 
         self.QA = Layers.QA
+        self.QE = Layers.QE
 
     def call(self, input, training=False):
         x = Layers.Quantize.A(input)
@@ -44,6 +45,7 @@ class lenet5(tf.keras.Model):
         x = self.fc2(x)
 
         x = self.QA(x)
+        x = self.QE(x)
 
         return x
 
@@ -51,6 +53,8 @@ class lenet5(tf.keras.Model):
         # Unpack the data. Its structure depends on your model and
         # on what you pass to `fit()`.
         x, y = data
+
+        x = Layers.QA(x)
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)  # Forward pass

@@ -1,14 +1,15 @@
 import os
 os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin") 
 import tensorflow as tf
+import Option
 
-LR    = 1
-bitsW = 3  # bit width of weights
-bitsA = 3 # bit width of activations
-bitsG = 13  # bit width of gradients
-bitsE = 13 # bit width of errors
+LR = Option.LR
+bitsW = Option.bitsW
+bitsA = Option.bitsA
+bitsE = Option.bitsE
+bitsG = Option.bitsG
 
-bitsR = 16  # bit width of randomizer
+bitsR = Option.bitsR
 
 W_scale = []
 

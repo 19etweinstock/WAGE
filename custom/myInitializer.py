@@ -4,8 +4,8 @@ from past.utils import old_div
 import math
 from tensorflow.python.framework import dtypes
 from tensorflow.python.ops import random_ops
+import Option
 import Quantize
-
 
 def variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False,
                                  seed=None, dtype=dtypes.float32):
@@ -91,7 +91,7 @@ def variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False,
 
 
     def scaleLimit(limit):
-      bitsW = Quantize.bitsW
+      bitsW = Option.bitsW
       scale = 1.0
       if bitsW < 32:
         beta = 1.5
