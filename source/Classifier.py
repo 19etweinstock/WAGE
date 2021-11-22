@@ -105,7 +105,7 @@ def main():
     data = testX
     answers = testY
 
-    for index in range(0, data.shape[0]):
+    for index in range(0, 1):
 
         # index = int(sys.argv[1])
         # index = 8
@@ -115,14 +115,14 @@ def main():
 
         result = runNetwork(image)
 
-        # print(testY[index])
-        # print(result)
+        print(testY[index])
+        print(result)
 
         # process result
-        max = np.max(result)
-        check = result == max
-        if (np.sum(check) == 1 and check[answer] == 1):
-            print(index)
+        # max = np.max(result)
+        # check = result == max
+        # if (np.sum(check) == 1 and check[answer] == 1):
+        #     print(index)
 
 
 

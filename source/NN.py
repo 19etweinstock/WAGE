@@ -196,7 +196,8 @@ class NN(object):
     with tf.compat.v1.name_scope('error'):
       if self.Y.dtype != tf.float32:  # classification labels
         label = tf.compat.v1.argmax(labels, axis=1)
-        in_top_k = 5 if self.shapeY[1] > 100 else 1
+        # in_top_k = 5 if self.shapeY[1] > 100 else 1
+        in_top_k = 1
         error = tf.compat.v1.reduce_mean(tf.compat.v1.cast(tf.compat.v1.logical_not(tf.compat.v1.nn.in_top_k(out, label, in_top_k)), tf.float32))
       else:  # regression errors
         error = loss

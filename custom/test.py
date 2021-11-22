@@ -1,4 +1,5 @@
 import os
+
 os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin") 
 import tensorflow as tf
 import numpy as np
@@ -33,6 +34,9 @@ model.compile(optimizer=tf.keras.optimizers.SGD(\
               metrics=['accuracy'],
               run_eagerly=False)
 
+print(f'W: {Quantize.bitsW}\nA: {Quantize.bitsA}\nG: {Quantize.bitsG}\nE: {Quantize.bitsE}\n')
+
+
 model.fit(x_train, y_train, epochs=100,batch_size=128)
 result=model.evaluate(x_test, y_test)
 
@@ -44,7 +48,7 @@ def upper(str):
 Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
 
 
-f = open(f'../weights/{result[1]} {Time} {Quantize.bitsW}{Quantize.bitsA}{upper(hex(Quantize.bitsG)[2:])}{upper(hex(Quantize.bitsE)[2:])} {Quantize.bitsR}', "wt")
+f = open(f'../weights/{result[1]} {Time} {Quantize.bitsW}{Quantize.bitsA}{upper(hex(Quantize.bitsG)[2:])}{upper(hex(Quantize.bitsE)[2:])} {Quantize.bitsR}.py', "wt")
 f.write("import numpy as np\n\n")
 f.flush()
 

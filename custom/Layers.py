@@ -21,13 +21,14 @@ def QA(x):
     return x
 
 class qconv2d(tf.keras.layers.Layer):
-    def __init__(self, ksize, c_out, stride=1, padding='VALID',name='conv'):
+    def __init__(self, ksize, c_out, index, stride=1, padding='VALID',name='conv'):
         super().__init__()
         self.ksize = ksize
         self.c_out = c_out
         self.stride = stride
         self.padding = padding
         self.named = name
+        self.index = index
         
     def build(self, input_shape):
         #input shape is NCHW:
@@ -37,7 +38,7 @@ class qconv2d(tf.keras.layers.Layer):
                                       dtype=tf.float32)
 
     def call(self, inputs):
-        weights = Quantize.W(self.kernel)
+        weights = Quantize.W(self.kernel, Quantize.W_scale[self.index])
         return tf.nn.conv2d(input=inputs, \
                             filters=weights, \
                             strides=_arr(self.stride), \
@@ -70,10 +71,11 @@ class qactivation(tf.keras.layers.Layer):
         return x
 
 class qfc(tf.keras.layers.Layer):
-    def __init__(self, c_out, name='fc') -> None:
+    def __init__(self, c_out, index, name='fc') -> None:
         super().__init__()
         self.c_out = c_out
         self.named = name
+        self.index = index
 
     def build(self, input_shape):
         #input shape is NCHW:
@@ -84,7 +86,7 @@ class qfc(tf.keras.layers.Layer):
     
     def call(self, inputs):
         # self.input_array=inputs
-        weights = Quantize.W(self.kernel)
+        weights = Quantize.W(self.kernel, Quantize.W_scale[self.index])
         # weights = self.kernel
         return tf.matmul(inputs, weights)
 

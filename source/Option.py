@@ -36,7 +36,7 @@ validNum = 0
 
 # loadModel = None
 loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
-saveModel = None
+# saveModel = None
 # saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
 
 
@@ -53,6 +53,7 @@ optimizer = tf.compat.v1.train.GradientDescentOptimizer(1)  # lr is controlled i
 seed = None
 sess = None
 W_scale = []
+eval = None
 
 def upper(str):
     return str.upper()

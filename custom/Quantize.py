@@ -3,13 +3,14 @@ os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/b
 import tensorflow as tf
 
 LR    = 1
-bitsW = 2  # bit width of weights
-bitsA = 2  # bit width of activations
-bitsG = 15  # bit width of gradients
-bitsE = 15 # bit width of errors
+bitsW = 3  # bit width of weights
+bitsA = 3 # bit width of activations
+bitsG = 13  # bit width of gradients
+bitsE = 13 # bit width of errors
 
 bitsR = 16  # bit width of randomizer
 
+W_scale = []
 
 def S(bits):
   return 2.0 ** (bits - 1)
@@ -77,7 +78,7 @@ def E(x):
       if bitsE > 15:
         return dy
       else:
-        xmax = tf.reduce_max(tf.abs(dy))
-        xmax_shift = Shift(xmax)
-        return Q(C( x /xmax_shift, bitsE), bitsE)
+        ymax = tf.reduce_max(tf.abs(dy))
+        ymax_shift = Shift(ymax)
+        return Q(C( dy /ymax_shift, bitsE), bitsE)
     return x, grad

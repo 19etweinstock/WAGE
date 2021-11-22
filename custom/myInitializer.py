@@ -5,7 +5,6 @@ import math
 from tensorflow.python.framework import dtypes
 from tensorflow.python.ops import random_ops
 import Quantize
-import Option
 
 
 def variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False,
@@ -101,7 +100,7 @@ def variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False,
         scale = scale if scale > 1 else 1.0
         # limit *= scale
         limit = Wm if Wm > limit else limit
-      Option.W_scale.append(scale)
+      Quantize.W_scale.append(scale)
       return limit
 
     if uniform:
