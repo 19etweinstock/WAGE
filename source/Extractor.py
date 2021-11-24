@@ -22,7 +22,7 @@ def main():
     graph = tf.compat.v1.get_default_graph() 
     vars = graph.get_collection('variables') 
 
-    f = open("weights.py", "wt")
+    f = open("weights_1288.py", "wt")
     f.write("import numpy as np\n\n")
     f.flush()
 

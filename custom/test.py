@@ -50,6 +50,13 @@ for i in range (0, len(Option.lr_schedule), 2):
     lr[0].append(Option.lr_schedule[i])
     lr[1].append(Option.lr_schedule[i+1])
 
+print(lr)
+
+# model(x_train[0:1,:,:,:])
+
+# vars = model.variables
+
+# model = Model.lenet5(6,8)
 
 model.compile(optimizer=tf.keras.optimizers.SGD(\
               learning_rate=tf.keras.optimizers.schedules.PiecewiseConstantDecay(lr[0], lr[1])),
@@ -57,20 +64,16 @@ model.compile(optimizer=tf.keras.optimizers.SGD(\
               metrics=['accuracy'],
               run_eagerly=False)
 
+
 model.fit(x_train, y_train, epochs=Option.Epoch,batch_size=Option.batchSize)
-result=model.evaluate(x_test, y_test)
+test=model.evaluate(x_test, y_test)
+train =model.evaluate(x_train, y_train)
 
 vars = model.variables
 
-def upper(str):
-    return str.upper()
-
-Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
-
-
-f = open(f'../weights/{result[1]} {Time} {Quantize.bitsW}{Quantize.bitsA}{upper(hex(Quantize.bitsG)[2:])}{upper(hex(Quantize.bitsE)[2:])} {Quantize.bitsR}.py', "wt")
-f.write(f'#W: {Quantize.bitsW}\n#A: {Quantize.bitsA}\n#G: {Quantize.bitsG}\n#E: {Quantize.bitsE}\n')
+f = open(f'../weights/{test[1]:.4f} {train[1]:.4f} {Time} ({Notes}).py', "wt")
 f.write("\nimport numpy as np\n\n")
+f.write(f'bitsW = {Quantize.bitsW}\nbitsA = {Quantize.bitsA}\nbitsG = {Quantize.bitsG}\nbitsE = {Quantize.bitsE}\n')
 
 f.flush()
 

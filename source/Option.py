@@ -5,17 +5,17 @@ tf.compat.v1.disable_eager_execution()
 tf.compat.v1.disable_v2_behavior()
 
 bitsW = 1  # bit width of weights
-bitsA = 1  # bit width of activations
-bitsG = 13  # bit width of gradients
-bitsE = 13 # bit width of errors
+bitsA = 2  # bit width of activations
+bitsG = 8  # bit width of gradients
+bitsE = 8 # bit width of errors
 
-bitsR = 16  # bit width of randomizer
+bitsR = 8  # bit width of randomizer
 
-lr_schedule = [0,1.1]
+lr_schedule = [0,1]
 
 Epoch = 100
 
-batchSize = 128
+batchSize = 48
 use_batch_norm = False
 
 dataSet = 'MNIST'  # 'MNIST','SVHN','CIFAR10', 'ILSVRC2012'
@@ -34,10 +34,10 @@ GPU = [0]
 validNum = 0
 
 
-# loadModel = None
-loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
+loadModel = None
+# loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
 # saveModel = None
-# saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
+saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
 
 
 lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)

@@ -1,12 +1,12 @@
 LR    = 1
 bitsW = 1  # bit width of weights
 bitsA = 2 # bit width of activations
-bitsG = 12  # bit width of gradients
-bitsE = 12 # bit width of errors
+bitsG = 8  # bit width of gradients
+bitsE = 8 # bit width of errors
 
-bitsR = 16  # bit width of randomizer
+bitsR = 8  # bit width of randomizer
 
-Epoch = 2
-batchSize = 128
+Epoch = 50
+batchSize = 48
 
-lr_schedule = [0,1]
+lr_schedule = [0, 1]

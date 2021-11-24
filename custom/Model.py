@@ -27,7 +27,7 @@ class lenet5(tf.keras.Model):
         self.QE = Layers.QE
 
     def call(self, input, training=False):
-        x = Layers.Quantize.A(input)
+        x = tf.stop_gradient(Layers.Quantize.A(input))
         x = self.conv0(x)
         x = self.pool0(x)
         x = self.activation0(x)
@@ -44,7 +44,7 @@ class lenet5(tf.keras.Model):
         x = self.activation3(x)
         x = self.fc2(x)
 
-        x = self.QA(x)
+        # x = self.QA(x)
         x = self.QE(x)
 
         return x
@@ -53,8 +53,6 @@ class lenet5(tf.keras.Model):
         # Unpack the data. Its structure depends on your model and
         # on what you pass to `fit()`.
         x, y = data
-
-        x = Layers.QA(x)
 
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)  # Forward pass

@@ -2,7 +2,7 @@ import os
 # from numpy.core.defchararray import array
 
 # from tensorflow.python.ops.gen_array_ops import reshape
-import weights_not_WAGE as weights
+import weights_9450_9422 as weights
 
 import sys
 
@@ -34,7 +34,11 @@ def conv2D(var, kernel):
     return result
 
 def activate(var):
-    return (np.sign(np.abs(var))+np.sign(var))/2
+    relued = np.maximum(var, 0)
+    max = 0.5
+    min = -0.5
+    temp = np.clip(relued, min, max)
+    return np.round(2 * temp) / 2
 
 def pool(img, factor=2):
     """ Perform max pooling with a (factor x factor) kernel"""
@@ -102,8 +106,8 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = testX[0:1000,:,:]
-    answers = testY[0:1000,:]
+    data = testX
+    answers = testY
 
     i = 0
     for index in range(0, data.shape[0]):
@@ -123,8 +127,8 @@ def main():
         max = np.max(result)
         check = result == max
         if (np.sum(check) == 1 and check[answer] == 1):
-            print(index, end=' ')
-            print(result)
+            # print(index,)
+            # print(result)
             i +=1
     print(i/data.shape[0])
 

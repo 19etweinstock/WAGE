@@ -1,0 +1,56 @@
+2021-11-23 1734
+LR    = 1
+bitsW = 1  # bit width of weights
+bitsA = 2 # bit width of activations
+bitsG = 10  # bit width of gradients
+bitsE = 10 # bit width of errors
+
+bitsR = 8  # bit width of randomizer
+
+Epoch = 50
+batchSize = 64
+
+lr_schedule = [0, 1]
+
+[[0], [1, 1]]
+Epoch 1/50
+938/938 [==============================] - 12s 9ms/step - loss: 0.1061 - accuracy: 0.1820
+Epoch 2/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0931 - accuracy: 0.3317
+Epoch 3/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0876 - accuracy: 0.4114
+Epoch 4/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0819 - accuracy: 0.4892
+Epoch 5/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0762 - accuracy: 0.5531
+Epoch 6/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0713 - accuracy: 0.6016
+Epoch 7/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0673 - accuracy: 0.6456
+Epoch 8/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0641 - accuracy: 0.6812
+Epoch 9/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0605 - accuracy: 0.7138
+Epoch 10/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0571 - accuracy: 0.7435
+Epoch 11/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0552 - accuracy: 0.7604
+Epoch 12/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0538 - accuracy: 0.7680
+Epoch 13/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0506 - accuracy: 0.7917
+Epoch 14/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0480 - accuracy: 0.8094
+Epoch 15/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0458 - accuracy: 0.8264
+Epoch 16/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0437 - accuracy: 0.8414
+Epoch 17/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0422 - accuracy: 0.8500
+Epoch 18/50
+938/938 [==============================] - 9s 9ms/step - loss: 0.0415 - accuracy: 0.8546
+Epoch 19/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0399 - accuracy: 0.8618
+Epoch 20/50
+938/938 [==============================] - 9s 10ms/step - loss: 0.0383 - accuracy: 0.8715
+Epoch 21/50

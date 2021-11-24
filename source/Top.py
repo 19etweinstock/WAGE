@@ -153,63 +153,63 @@ def main():
           
   # f.close()
 
-  # print("\nOptimization Start!\n")
-  # for epoch in range(Option.Epoch):
+  print("\nOptimization Start!\n")
+  for epoch in range(Option.Epoch):
 
-  #   # check lr_schedule
-  #   if old_div(len(Option.lr_schedule), 2):
-  #     if epoch == Option.lr_schedule[0]:
-  #       Option.lr_schedule.pop(0)
-  #       lr_new = Option.lr_schedule.pop(0)
-  #       if lr_new == 0:
-  #         print('Optimization Ended!')
-  #         exit(0)
-  #       lr_old = sess.run(Option.lr)
-  #       sess.run(Option.lr.assign(lr_new))
-  #       print('lr: %f -> %f' % (lr_old, lr_new))
+    # check lr_schedule
+    if old_div(len(Option.lr_schedule), 2):
+      if epoch == Option.lr_schedule[0]:
+        Option.lr_schedule.pop(0)
+        lr_new = Option.lr_schedule.pop(0)
+        if lr_new == 0:
+          print('Optimization Ended!')
+          exit(0)
+        lr_old = sess.run(Option.lr)
+        sess.run(Option.lr.assign(lr_new))
+        print('lr: %f -> %f' % (lr_old, lr_new))
 
-  #   print('Epoch: %03d ' % (epoch), end=' ')
+    print('Epoch: %03d ' % (epoch), end=' ')
 
-  #   lossTotal = 0.
-  #   errorTotal = 0
-  #   t0 = time.time()
-  #   for batchNum in tqdm(range(batchNumTrain),desc = 'Epoch: %03d'%epoch, leave=False, smoothing=0.1):
-  #     _, loss_delta, error_delta = sess.run([train_op, lossTrainBatch, errorTrainBatch])
-  #     # _, loss_delta, error_delta, H, W, W_q, gradsH, gradsW, gradW_q=\
-  #     # sess.run([train_op, lossTrainBatch, errorTrainBatch, Net[0].H, Net[0].W, Net[0].W_q, Net[0].gradsH, Net[0].gradsW, gradTrainBatch])
+    lossTotal = 0.
+    errorTotal = 0
+    t0 = time.time()
+    for batchNum in tqdm(range(batchNumTrain),desc = 'Epoch: %03d'%epoch, leave=False, smoothing=0.1):
+      _, loss_delta, error_delta = sess.run([train_op, lossTrainBatch, errorTrainBatch])
+      # _, loss_delta, error_delta, H, W, W_q, gradsH, gradsW, gradW_q=\
+      # sess.run([train_op, lossTrainBatch, errorTrainBatch, Net[0].H, Net[0].W, Net[0].W_q, Net[0].gradsH, Net[0].gradsW, gradTrainBatch])
 
-  #     lossTotal += loss_delta
-  #     errorTotal += error_delta
+      lossTotal += loss_delta
+      errorTotal += error_delta
 
-  #   lossTotal /= batchNumTrain
-  #   errorTotal /= batchNumTrain
+    lossTotal /= batchNumTrain
+    errorTotal /= batchNumTrain
 
-  #   print('Loss: %.6f Train: %.4f' % (lossTotal, errorTotal), end=' ')
+    print('Loss: %.6f Train: %.4f' % (lossTotal, errorTotal), end=' ')
 
-  #   # get test error
-  #   errorTest = getErrorTest()
-  #   print('Test: %.4f FPS: %d' % (errorTest,old_div(numTrain, (time.time() - t0))), end=' ')
+    # get test error
+    errorTest = getErrorTest()
+    print('Test: %.4f FPS: %d' % (errorTest,old_div(numTrain, (time.time() - t0))), end=' ')
 
 
-  #   if epoch == 0:
-  #     errorTestBest = errorTest
-  #     errorTrainBest = errorTotal
+    if epoch == 0:
+      errorTestBest = errorTest
+      errorTrainBest = errorTotal
 
-  #   if errorTest < errorTestBest:
-  #     errorTestBest = errorTest
-  #     if Option.saveModel is not None:
-  #       saver.save(sess, Option.saveModel)
-  #       print('S', end=' ')
-  #     print('BEST', end=' ')
-  #   elif (errorTest == errorTestBest and errorTrainBest < errorTotal):
-  #     errorTestBest = errorTest
-  #     errorTrainBest = errorTotal
-  #     if Option.saveModel is not None:
-  #       saver.save(sess, Option.saveModel)
-  #       print('S', end=' ')
-  #     print('BEST', end=' ')
+    if errorTest < errorTestBest:
+      errorTestBest = errorTest
+      if Option.saveModel is not None:
+        saver.save(sess, Option.saveModel)
+        print('S', end=' ')
+      print('BEST', end=' ')
+    elif (errorTest == errorTestBest and errorTrainBest < errorTotal):
+      errorTestBest = errorTest
+      errorTrainBest = errorTotal
+      if Option.saveModel is not None:
+        saver.save(sess, Option.saveModel)
+        print('S', end=' ')
+      print('BEST', end=' ')
 
-  #   print('')
+    print('')
 
 
 if __name__ == '__main__':
