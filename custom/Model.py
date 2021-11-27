@@ -45,6 +45,7 @@ class lenet5(tf.keras.Model):
         x = self.fc2(x)
 
         # x = self.QA(x)
+        x = tf.nn.relu(x)
         x = self.QE(x)
 
         return x
