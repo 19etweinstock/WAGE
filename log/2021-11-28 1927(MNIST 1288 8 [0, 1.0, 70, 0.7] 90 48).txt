@@ -1,0 +1,179 @@
+2021-11-28 1927
+import time
+import tensorflow as tf
+
+tf.compat.v1.disable_eager_execution()
+tf.compat.v1.disable_v2_behavior()
+
+bitsW = 1  # bit width of weights
+bitsA = 2  # bit width of activations
+bitsG = 8  # bit width of gradients
+bitsE = 8 # bit width of errors
+
+bitsR = 8  # bit width of randomizer
+
+lr_schedule = [0,1]
+
+Epoch = 100
+
+batchSize = 48
+use_batch_norm = False
+
+dataSet = 'MNIST'  # 'MNIST','SVHN','CIFAR10', 'ILSVRC2012'
+
+def upper(str):
+    return str.upper()
+
+batch_text = 'batch norm' if use_batch_norm else ''
+
+Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
+Notes = f'{dataSet} {bitsW}{bitsA}{upper(hex(bitsG)[2:])}{upper(hex(bitsE)[2:])} {bitsR} {lr_schedule} {Epoch} {batchSize} {batch_text}'
+# Notes = 'lenet5 2888'
+# Notes = 'alexnet 28CC'
+
+GPU = [0]
+validNum = 0
+
+
+loadModel = None
+# loadModel = '../model/2021-10-25 1108(MNIST 11DD 16 [0, 1.1] 100 128 ).tf'
+# saveModel = None
+saveModel = '../model/' + Time + '(' + Notes + ')' + '.tf'
+
+
+lr = tf.compat.v1.Variable(initial_value=0., trainable=False, name='lr', dtype=tf.float32)
+# lr_schedule = [0, 8, 200, 1,250,1./8,300,0]
+# lr_schedule = [0, 32, 40, 32./8, 60, 32./64, 80, 0]
+L2 = 0
+
+lossFunc = 'SSE'
+# lossFunc = tf.losses.softmax_cross_entropy
+optimizer = tf.compat.v1.train.GradientDescentOptimizer(1)  # lr is controlled in Quantize.G
+
+# shared variables, defined by other files
+seed = None
+sess = None
+W_scale = []
+eval = None
+
+def upper(str):
+    return str.upper()
+
+[[0, 70], [1.0, 1.0, 0.7]]
+Model: "lenet5"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+qa (qa)                      multiple                  0         
+_________________________________________________________________
+qconv2d (qconv2d)            multiple                  150       
+_________________________________________________________________
+maxpool (maxpool)            multiple                  0         
+_________________________________________________________________
+qactivation (qactivation)    multiple                  0         
+_________________________________________________________________
+qconv2d_1 (qconv2d)          multiple                  1200      
+_________________________________________________________________
+maxpool_1 (maxpool)          multiple                  0         
+_________________________________________________________________
+qactivation_1 (qactivation)  multiple                  0         
+_________________________________________________________________
+reshape (reshape)            multiple                  0         
+_________________________________________________________________
+qfc (qfc)                    multiple                  15360     
+_________________________________________________________________
+qactivation_2 (qactivation)  multiple                  0         
+_________________________________________________________________
+qfc_1 (qfc)                  multiple                  10080     
+_________________________________________________________________
+qactivation_3 (qactivation)  multiple                  0         
+_________________________________________________________________
+qfc_2 (qfc)                  multiple                  840       
+_________________________________________________________________
+qsoftmax (qsoftmax)          multiple                  0         
+=================================================================
+Total params: 27,630
+Trainable params: 27,630
+Non-trainable params: 0
+_________________________________________________________________
+Epoch 1/90
+1250/1250 [==============================] - 35s 18ms/step - loss: 0.0765 - accuracy: 0.4000
+Epoch 2/90
+1250/1250 [==============================] - 13s 11ms/step - loss: 0.0431 - accuracy: 0.7188
+Epoch 3/90
+1250/1250 [==============================] - 13s 11ms/step - loss: 0.0299 - accuracy: 0.8119
+Epoch 4/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0233 - accuracy: 0.8576
+Epoch 5/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0194 - accuracy: 0.8813
+Epoch 6/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0171 - accuracy: 0.8940
+Epoch 7/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0155 - accuracy: 0.9034
+Epoch 8/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0141 - accuracy: 0.9120
+Epoch 9/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0130 - accuracy: 0.9185
+Epoch 10/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0125 - accuracy: 0.9217
+Epoch 11/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0123 - accuracy: 0.9217
+Epoch 12/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0122 - accuracy: 0.9226
+Epoch 13/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0112 - accuracy: 0.9306
+Epoch 14/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0110 - accuracy: 0.9310
+Epoch 15/90
+1250/1250 [==============================] - 13s 11ms/step - loss: 0.0104 - accuracy: 0.9341
+Epoch 16/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0105 - accuracy: 0.9327
+Epoch 17/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0103 - accuracy: 0.9349
+Epoch 18/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0101 - accuracy: 0.9356
+Epoch 19/90
+1250/1250 [==============================] - 12s 9ms/step - loss: 0.0100 - accuracy: 0.9373
+Epoch 20/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0099 - accuracy: 0.9378
+Epoch 21/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0102 - accuracy: 0.9361
+Epoch 22/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0099 - accuracy: 0.9375
+Epoch 23/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0093 - accuracy: 0.9416
+Epoch 24/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0095 - accuracy: 0.9392
+Epoch 25/90
+1250/1250 [==============================] - 12s 9ms/step - loss: 0.0094 - accuracy: 0.9406
+Epoch 26/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0093 - accuracy: 0.9411
+Epoch 27/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0094 - accuracy: 0.9400
+Epoch 28/90
+1250/1250 [==============================] - 12s 9ms/step - loss: 0.0092 - accuracy: 0.9416
+Epoch 29/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0092 - accuracy: 0.9421
+Epoch 30/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0092 - accuracy: 0.9411
+Epoch 31/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0089 - accuracy: 0.9439
+Epoch 32/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0087 - accuracy: 0.9454
+Epoch 33/90
+1250/1250 [==============================] - 13s 10ms/step - loss: 0.0090 - accuracy: 0.9430
+Epoch 34/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0087 - accuracy: 0.9445
+Epoch 35/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0090 - accuracy: 0.9421
+Epoch 36/90
+1250/1250 [==============================] - 12s 9ms/step - loss: 0.0088 - accuracy: 0.9447
+Epoch 37/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0090 - accuracy: 0.9436
+Epoch 38/90
+1250/1250 [==============================] - 12s 10ms/step - loss: 0.0087 - accuracy: 0.9455
+Epoch 39/90
+ 300/1250 [======>.......................] - ETA: 10s - loss: 0.0087 - accuracy: 0.9442Batch 301: Invalid loss, terminating training
+1250/1250 [==============================] - 3s 3ms/step - loss: nan - accuracy: 0.9418
+313/313 [==============================] - 2s 5ms/step - loss: nan - accuracy: 0.0980
+1875/1875 [==============================] - 10s 5ms/step - loss: nan - accuracy: 0.0987

@@ -10,24 +10,30 @@ from functools import reduce
 def _arr(_stride):
     return [1, 1, _stride, _stride]
 
-def QE(x):
+def _QE(x):
     if Quantize.bitsE <= 16:
         x = Quantize.E(x)
     return x
     
-def QA(x):
+def _QA(x):
     if Quantize.bitsA <= 16:
         x = Quantize.A(x)
     return x
 
+class qa(tf.keras.layers.Layer):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def call(self, inputs):
+        return _QA(inputs)
+
 class qconv2d(tf.keras.layers.Layer):
-    def __init__(self, ksize, c_out, stride=1, padding='VALID',name='conv'):
+    def __init__(self, ksize, c_out, stride=1, padding='VALID'):
         super().__init__()
         self.ksize = ksize
         self.c_out = c_out
         self.stride = stride
         self.padding = padding
-        self.named = name
         
     def build(self, input_shape):
         #input shape is NCHW:
@@ -44,7 +50,7 @@ class qconv2d(tf.keras.layers.Layer):
                             strides=_arr(self.stride), \
                             padding=self.padding, \
                             data_format='NCHW', \
-                            name=self.named)
+                            name=self.name)
 
 class maxpool(tf.keras.layers.Layer):
     def __init__(self, ksize=2, stride=2, padding='SAME'):
@@ -66,15 +72,23 @@ class qactivation(tf.keras.layers.Layer):
 
     def call(self, inputs):
         x = tf.nn.relu(inputs)
-        x = QE(x)
-        x = QA(x)
+        x = _QE(x)
+        x = _QA(x)
+        return x
+
+class qsoftmax(tf.keras.layers.Layer):
+    def __init__(self):
+        super().__init__()
+
+    def call(self, inputs):
+        x = tf.clip_by_value(inputs, 0, 1)
+        x = _QE(x)
         return x
 
 class qfc(tf.keras.layers.Layer):
-    def __init__(self, c_out, index, name='fc') -> None:
+    def __init__(self, c_out) -> None:
         super().__init__()
         self.c_out = c_out
-        self.named = name
 
     def build(self, input_shape):
         #input shape is NCHW:

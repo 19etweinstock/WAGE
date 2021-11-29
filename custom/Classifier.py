@@ -2,7 +2,7 @@ import os
 # from numpy.core.defchararray import array
 
 # from tensorflow.python.ops.gen_array_ops import reshape
-import weights_9450_9422 as weights
+import weights_9581_9579 as weights
 
 import sys
 
@@ -112,8 +112,8 @@ def main():
     i = 0
     for index in range(0, data.shape[0]):
 
-        # index = int(sys.argv[1])
-        # index = 8
+    # index = int(sys.argv[1])
+    # index = 8
 
         image = data[index,:,:,0]
         answer = getAnswer(answers[index])
@@ -122,12 +122,13 @@ def main():
 
         # print(testY[index])
         # print(result)
+        # print(np.maximum(result, 0))
 
         # process result
         max = np.max(result)
         check = result == max
         if (np.sum(check) == 1 and check[answer] == 1):
-            # print(index,)
+            # print(index)
             # print(result)
             i +=1
     print(i/data.shape[0])

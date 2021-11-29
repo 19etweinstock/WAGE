@@ -1,4 +1,10 @@
+# the maximum output of the quantized network is 0.5
+# try training with quantized output but set the answers to be 0.5 instead of 1 so that loss for perfect is 0
+# otherwise there is inherent loss even for correct prediction because it has not achieved maximum value (which it cannot)
+
+
 import os
+from re import T
 
 os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin") 
 import tensorflow as tf
@@ -52,11 +58,21 @@ for i in range (0, len(Option.lr_schedule), 2):
 
 print(lr)
 
-# model(x_train[0:1,:,:,:])
+model(x_train[0:1,:,:,:])
 
 # vars = model.variables
 
-# model = Model.lenet5(6,8)
+model.summary()
+
+# layers = model.layers
+# 
+# conv_weights = 0
+# fc_weights = 0
+# print fc & conv weights with 
+# for i in range(0, len(layers)):
+    # if (layers[i].weights):
+        # 
+
 
 model.compile(optimizer=tf.keras.optimizers.SGD(\
               learning_rate=tf.keras.optimizers.schedules.PiecewiseConstantDecay(lr[0], lr[1])),
@@ -64,8 +80,18 @@ model.compile(optimizer=tf.keras.optimizers.SGD(\
               metrics=['accuracy'],
               run_eagerly=False)
 
+mycallbacks = [
+    tf.keras.callbacks.TerminateOnNaN(),
+    tf.keras.callbacks.ModelCheckpoint(
+        filepath=('../model/' + Time + '(' + Notes + ')'),
+        save_weights_only=True,
+        monitor='accuracy',
+        save_best_only=True,
+        mode='max'
+    )
+]
 
-model.fit(x_train, y_train, epochs=Option.Epoch,batch_size=Option.batchSize)
+model.fit(x_train, y_train, epochs=Option.Epoch,batch_size=Option.batchSize, callbacks=mycallbacks)
 test=model.evaluate(x_test, y_test)
 train =model.evaluate(x_train, y_train)
 

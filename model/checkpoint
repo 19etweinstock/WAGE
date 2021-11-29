@@ -1,2 +1,2 @@
-model_checkpoint_path: "2021-11-24 0000(MNIST 1288 8 [0, 1] 100 48 ).tf"
-all_model_checkpoint_paths: "2021-11-24 0000(MNIST 1288 8 [0, 1] 100 48 ).tf"
+model_checkpoint_path: "2021-11-28 2300(MNIST 1288 8 [0, 1.0, 70, 0.7] 90 48)"
+all_model_checkpoint_paths: "2021-11-28 2300(MNIST 1288 8 [0, 1.0, 70, 0.7] 90 48)"
