@@ -62,21 +62,17 @@ class lenet5(tf.keras.Model):
             loss = self.compiled_loss(y, y_pred, regularization_losses=self.losses)
 
         # if our prediction is perfect and loss is 0, gradient is nan
-        # do not update if loss is 0
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
         for i in range(0,len(gradients)):
-            gradients[i]= tf.cond(loss > tf.constant(0.0, dtype=tf.float32),
-                                    true_fn  = lambda: Quantize.G(gradients[i]),
-                                    false_fn = lambda : tf.zeros(gradients[i].shape))
+            gradients[i] = Quantize.G(gradients[i])
+
         # Compute gradients
         # Update weights
-        self.optimizer.apply_gradients(zip(gradients, trainable_vars))
-
-
+        # do not update if loss is 0
         tf.cond(loss > tf.constant(0.0, dtype=tf.float32), 
-                true_fn = self.optimizer.apply_gradients(zip(gradients, trainable_vars)),
-                false_fn=None)
+                true_fn = lambda : self.optimizer.apply_gradients(zip(gradients, trainable_vars)),
+                false_fn= tf.no_op)
         # Update metrics (includes the metric that tracks the loss)
         self.compiled_metrics.update_state(y, y_pred)
         # Return a dict mapping metric names to current value
