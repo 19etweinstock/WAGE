@@ -1,12 +1,12 @@
 import tkinter as tk
 import numpy as np
+import cv2
 from tkinter import filedialog as fd
 from tkinter import messagebox
 from PIL import ImageTk,Image,ImageDraw
 from urllib.request import urlopen
 import time
-
-model = tf.keras.models.load_model('MNIST_model.h5')
+import Classifier
 
 def event_function(event):
     
@@ -63,11 +63,11 @@ def predict():
     img_array=cv2.resize(img_array,(28,28))
         
     img_array=img_array/255.0
-    img_array=img_array.reshape(-1,784)
-    result=model.predict(img_array)
-    label=np.argmax(result,axis=1)
+    result = Classifier.runNetwork(img_array)
+    print(result)
+    label=np.argmax(result)
     
-    label_status.config(text='Predicted Digit :  '+str(label[0]))
+    label_status.config(text='Predicted Digit :  '+str(label))
     
     
 win=tk.Tk()
