@@ -70,9 +70,12 @@ class lenet5(tf.keras.Model):
         # Compute gradients
         # Update weights
         # do not update if loss is 0
-        tf.cond(loss > tf.constant(0.0, dtype=tf.float32), 
-                true_fn = lambda : self.optimizer.apply_gradients(zip(gradients, trainable_vars)),
-                false_fn= tf.no_op)
+        # if any gradients are nan do nothing
+
+        # if any gradients are 0, it will be the ones for the first layer (last calculated)
+        tf.cond(tf.math.reduce_any(tf.math.is_nan(gradients[0])), 
+                false_fn = lambda : self.optimizer.apply_gradients(zip(gradients, trainable_vars)),
+                true_fn= tf.no_op)
         # Update metrics (includes the metric that tracks the loss)
         self.compiled_metrics.update_state(y, y_pred)
         # Return a dict mapping metric names to current value

@@ -2,7 +2,9 @@ import os
 # from numpy.core.defchararray import array
 
 # from tensorflow.python.ops.gen_array_ops import reshape
-import weights_9581_9579 as weights
+# 9670 is better with 0.9651 prediction
+
+import weights_9670_9621 as weights
 
 import sys
 
@@ -106,7 +108,7 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = testX
+    data = testX / 255.0
     answers = testY
 
     i = 0

@@ -6,7 +6,10 @@ bitsE = 8 # bit width of errors
 
 bitsR = 8  # bit width of randomizer
 
-Epoch = 90
-batchSize = 48
+Epoch = 70
+batchSize = 50
 
-lr_schedule = [0, 1., 70, 0.7]
+lr_schedule = [0, 1., 20, 0.7, 45, 0.2]
+
+# loadModel = None
+loadModel = '2021-11-29 2219(MNIST 1288 8 [0, 1.0, 20, 0.7, 45, 0.2] 70 50)'
