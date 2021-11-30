@@ -43,10 +43,11 @@ def upload():
 
     global img , dispimg
     path=fd.askopenfilename(filetypes=[("Image File",'.jpg')])
-    img = Image.open(path)
-    dispimg = ImageTk.PhotoImage(img.resize((400,400)))
-    canvas.create_image(250,250,image= dispimg)
-    predict()
+    if path is not None and path != '':
+        img = Image.open(path)
+        dispimg = ImageTk.PhotoImage(img.resize((400,400)))
+        canvas.create_image(250,250,image= dispimg)
+        predict()
 
 
 def predict():
@@ -66,7 +67,9 @@ def predict():
     result = Classifier.runNetwork(img_array)
     print(result)
     label=np.argmax(result)
-    
+    max = np.max(result)
+    if (np.sum(result == max) != 1):
+        label = 'n/a'
     label_status.config(text='Predicted Digit :  '+str(label))
     
     
