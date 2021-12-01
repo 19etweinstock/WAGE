@@ -2,6 +2,8 @@
 from __future__ import division
 from past.utils import old_div
 import math
+import os
+os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin") 
 from tensorflow.python.framework import dtypes
 from tensorflow.python.ops import random_ops
 import Option

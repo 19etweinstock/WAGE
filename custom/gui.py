@@ -69,7 +69,10 @@ def predict():
     label=np.argmax(result)
     max = np.max(result)
     if (np.sum(result == max) != 1):
-        label = 'n/a'
+        label = []
+        for i in range(0,10):
+            if(result[i] == max):
+                label.append(i)
     label_status.config(text='Predicted Digit :  '+str(label))
     
     
