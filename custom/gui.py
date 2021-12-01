@@ -68,12 +68,20 @@ def predict():
     print(result)
     label=np.argmax(result)
     max = np.max(result)
-    if (np.sum(result == max) != 1):
+    if (result[label] >= 1 and np.sum(result <=0) == 9):
+        label = f'strong {label}'
+    elif (np.sum(result<=0) == 9):
+        label = f'weak {label}'
+    elif (np.sum(result == 0.) == 10):
+        label = 'no prediction'
+    elif (np.sum(result <=0) != 9 and np.sum(result == max) == 1):
+        label = f'confused {label}'
+    elif (np.sum(result == max) != 1):
         label = []
         for i in range(0,10):
             if(result[i] == max):
                 label.append(i)
-    label_status.config(text='Predicted Digit :  '+str(label))
+    label_status.config(text='Predicted Digit : '+str(label))
     
     
 win=tk.Tk()
