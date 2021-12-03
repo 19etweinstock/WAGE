@@ -108,7 +108,7 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = testX / 255.0
+    data = testX / 256.0
     answers = testY
 
     i = 0

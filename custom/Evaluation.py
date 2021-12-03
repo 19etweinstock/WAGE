@@ -12,7 +12,6 @@ import Option
 import Log
 from functools import reduce
 import Model
-import GetData
 
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -20,7 +19,7 @@ from sklearn.metrics import classification_report
 
 mnist = tf.keras.datasets.mnist
 (x_train, y_train),(x_test, y_test) = mnist.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
+x_train, x_test = x_train / 256.0, x_test / 256.0
 x_train = np.expand_dims(x_train, 1)
 x_test = np.expand_dims(x_test, 1)
 y_test_val = y_test
@@ -83,6 +82,9 @@ model.compile(optimizer=tf.keras.optimizers.SGD(\
               loss=sse,
               metrics=['accuracy'],
               run_eagerly=False)
+
+test=model.evaluate(x_test, y_test)
+train =model.evaluate(x_train, y_train)              
 
 prediction=tf.math.argmax(model.predict(x_test), 1)
 cm = tf.math.confusion_matrix(labels=y_test_val,predictions=prediction, num_classes=10)
