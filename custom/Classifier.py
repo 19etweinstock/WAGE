@@ -1,11 +1,12 @@
 import os
-# from numpy.core.defchararray import array
 
-# from tensorflow.python.ops.gen_array_ops import reshape
-# 9670 is better with 0.9651 prediction (255)
-# 9680 is better with 0.9656 prediction (256)
+#                   test train
+# 9670 9613 reaches 9652 
+# 9675 9613 reaches 9640 
+# 9679 9663 reaches 9656 
+# 9680 9610 reaches 9656 
 
-import weights_9680_9610 as weights
+import weights_9679_9663 as weights
 
 import sys
 
@@ -109,8 +110,8 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = testX / 256.0
-    answers = testY
+    data = trainX / 256.0
+    answers = trainY
 
     i = 0
     for index in range(0, data.shape[0]):
@@ -134,7 +135,7 @@ def main():
             # print(index)
             # print(result)
             i +=1
-    print(i/data.shape[0])
+    print(f'{i/data.shape[0]}')
 
 
 
