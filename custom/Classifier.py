@@ -2,9 +2,10 @@ import os
 # from numpy.core.defchararray import array
 
 # from tensorflow.python.ops.gen_array_ops import reshape
-# 9670 is better with 0.9651 prediction
+# 9670 is better with 0.9651 prediction (255)
+# 9680 is better with 0.9656 prediction (256)
 
-import weights_9670_9621 as weights
+import weights_9680_9610 as weights
 
 import sys
 

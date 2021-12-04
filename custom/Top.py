@@ -93,72 +93,76 @@ mycallbacks = [
     )
 ]
 
-model.fit(x_train, y_train, epochs=Option.Epoch,batch_size=Option.batchSize, callbacks=mycallbacks,
+# every so often refresh with the best model
+for i in range(0, Option.loops):
+    model.fit(x_train, y_train, epochs=Option.Epoch,batch_size=Option.batchSize, callbacks=mycallbacks,
             validation_data=(x_test, y_test), 
             validation_batch_size=256)
 
-# get the best possible run
-model.load_weights(savePath)
-test=model.evaluate(x_test, y_test)
-train =model.evaluate(x_train, y_train)
+    # get the best possible run
+    model.load_weights(savePath)
 
-vars = model.variables
 
-f = open(f'../weights/{test[1]:.4f} {train[1]:.4f} {Time} ({Notes}).py', "wt")
-f.write("\nimport numpy as np\n\n")
-f.write(f'bitsW = {Quantize.bitsW}\nbitsA = {Quantize.bitsA}\nbitsG = {Quantize.bitsG}\nbitsE = {Quantize.bitsE}\n')
+    test=model.evaluate(x_test, y_test, batch_size=256)
+    train =model.evaluate(x_train, y_train, batch_size=256)
 
-f.flush()
+    vars = model.variables
 
-for var in range(0,2):
-    tensor=vars[var].value()
-    for in_filter in range(0, tensor.shape.as_list()[2]):
-        for out_filter in range(0,tensor.shape.as_list()[3]):
-            f.write(f"conv{var}_in{in_filter}_out{out_filter} = np.array([\n")
-            quant = Quantize.W(tensor, Quantize.W_scale[var])
-            quant_array = quant.numpy()
-            for row in range(0,5):
-                f.write("\t[")
-                for col in range(0,5):
-                    f.write(f"{quant_array[row,col,in_filter,out_filter]}{', ' if col != 4 else ''}")
-                f.write("]")
-                if (row != 4):
-                    f.write(",\n")
-                
-            f.write("])\n\n")
-            f.flush()
-    for out_filter in range(0, tensor.shape.as_list()[3]):
-        f.write(f"weights_conv{var}_out{out_filter} = np.array([\n")
+    f = open(f'../weights/{test[1]:.4f} {train[1]:.4f} {Time} ({Notes}).py', "wt")
+    f.write("\nimport numpy as np\n\n")
+    f.write(f'bitsW = {Quantize.bitsW}\nbitsA = {Quantize.bitsA}\nbitsG = {Quantize.bitsG}\nbitsE = {Quantize.bitsE}\n')
+
+    f.flush()
+
+    for var in range(0,2):
+        tensor=vars[var].value()
         for in_filter in range(0, tensor.shape.as_list()[2]):
-            f.write(f"\tconv{var}_in{in_filter}_out{out_filter}")
-            if (in_filter != tensor.shape.as_list()[2] - 1):
+            for out_filter in range(0,tensor.shape.as_list()[3]):
+                f.write(f"conv{var}_in{in_filter}_out{out_filter} = np.array([\n")
+                quant = Quantize.W(tensor, Quantize.W_scale[var])
+                quant_array = quant.numpy()
+                for row in range(0,5):
+                    f.write("\t[")
+                    for col in range(0,5):
+                        f.write(f"{quant_array[row,col,in_filter,out_filter]}{', ' if col != 4 else ''}")
+                    f.write("]")
+                    if (row != 4):
+                        f.write(",\n")
+                    
+                f.write("])\n\n")
+                f.flush()
+        for out_filter in range(0, tensor.shape.as_list()[3]):
+            f.write(f"weights_conv{var}_out{out_filter} = np.array([\n")
+            for in_filter in range(0, tensor.shape.as_list()[2]):
+                f.write(f"\tconv{var}_in{in_filter}_out{out_filter}")
+                if (in_filter != tensor.shape.as_list()[2] - 1):
+                    f.write(",\n")
+                else:
+                    f.write("])\n\n")
+        
+        f.write(f"weights_conv{var} = np.array([\n")
+        for out_filter in range(0, tensor.shape.as_list()[3]):
+            f.write(f"\tweights_conv{var}_out{out_filter}")
+            if (out_filter != tensor.shape.as_list()[3] - 1):
                 f.write(",\n")
             else:
                 f.write("])\n\n")
-    
-    f.write(f"weights_conv{var} = np.array([\n")
-    for out_filter in range(0, tensor.shape.as_list()[3]):
-        f.write(f"\tweights_conv{var}_out{out_filter}")
-        if (out_filter != tensor.shape.as_list()[3] - 1):
-            f.write(",\n")
-        else:
-            f.write("])\n\n")
-for var in range(2,5):
-    tensor=vars[var].value()
-    quant = Quantize.W(tensor, Quantize.W_scale[var])
-    quant_array = quant.numpy()
-    f.write(f"fc{var-2} = np.array([\n")
-    rows=tensor.shape.as_list()[0]
-    cols=tensor.shape.as_list()[1]
-    for row in range(0,rows):
-        f.write("\t[")
-        for col in range(0, cols):
-            f.write(f"{quant_array[row,col]}{', ' if col != (cols-1) else ''}")
-        f.write("]")
-        if (row != (rows -1)):
-            f.write(",\n")
-        
-    f.write("])\n\n")
-    f.flush()
-        
-f.close()
+    for var in range(2,5):
+        tensor=vars[var].value()
+        quant = Quantize.W(tensor, Quantize.W_scale[var])
+        quant_array = quant.numpy()
+        f.write(f"fc{var-2} = np.array([\n")
+        rows=tensor.shape.as_list()[0]
+        cols=tensor.shape.as_list()[1]
+        for row in range(0,rows):
+            f.write("\t[")
+            for col in range(0, cols):
+                f.write(f"{quant_array[row,col]}{', ' if col != (cols-1) else ''}")
+            f.write("]")
+            if (row != (rows -1)):
+                f.write(",\n")
+            
+        f.write("])\n\n")
+        f.flush()
+            
+    f.close()

@@ -20,7 +20,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/custom/Top.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/source",
+            "cwd": "${workspaceFolder}/custom",
             "justMyCode": false
         }
     ]

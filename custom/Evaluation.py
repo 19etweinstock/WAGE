@@ -55,7 +55,7 @@ model(x_train[0:1,:,:,:])
 
 if Option.loadModel is not None:
     # loading the model does not load the scaling factor
-    model.load_weights(f'../model/2021-11-29 2237(MNIST 1288 8 [0, 1.0, 20, 0.7, 45, 0.2] 70 50)')
+    model.load_weights(f'../model/2021-12-03 1640(MNIST 1288 8 [0, 1.0, 20, 0.7, 35, 0.2] 50 50)')
 
 model.summary()
 
