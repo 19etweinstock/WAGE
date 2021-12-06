@@ -3,7 +3,7 @@ import os
 #                   test train
 # 9670 9613 reaches 9652 
 # 9675 9613 reaches 9640 
-# 9679 9663 reaches 9656 
+# 9679 9663 reaches 9656 9632
 # 9680 9610 reaches 9656 
 
 import weights_9679_9663 as weights
@@ -113,6 +113,10 @@ def main():
     data = trainX / 256.0
     answers = trainY
 
+    f = open(f'train_out_9679_9663.py', "wt")
+    f.write("\nimport numpy as np\n\n")
+
+    f.write('output = np.array([')
     i = 0
     for index in range(0, data.shape[0]):
 
@@ -123,6 +127,8 @@ def main():
         answer = getAnswer(answers[index])
 
         result = runNetwork(image)
+        f.write(f"\t[{result[0]}, {result[1]}, {result[2]}, {result[3]}, {result[4]}, {result[5]}, {result[6]}")
+        f.write(f", {result[7]}, {result[8]}, {result[9]}]{', ' if index != (data.shape[0] -1) else ''}\n")
 
         # print(testY[index])
         # print(result)
@@ -136,6 +142,7 @@ def main():
             # print(result)
             i +=1
     print(f'{i/data.shape[0]}')
+    f.write(f'])\n\n # Correct: {i/data.shape[0]}')
 
 
 
