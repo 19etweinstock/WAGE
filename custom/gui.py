@@ -85,7 +85,7 @@ def predict():
     
     
 win=tk.Tk()
-win.title("MNIST Digit Prediction by Sahil Kavitake")
+win.title("Quantized MNIST Digit Prediction by Ethan Weinstock")
 win.resizable(height=False,width=False)
 
 

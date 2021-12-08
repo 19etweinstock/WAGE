@@ -110,10 +110,10 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = trainX / 256.0
-    answers = trainY
+    data = testX / 256.0
+    answers = testY
 
-    f = open(f'train_out_9679_9663.py', "wt")
+    f = open(f'test_out_9679_9663.py', "wt")
     f.write("\nimport numpy as np\n\n")
 
     f.write('output = np.array([')
@@ -128,7 +128,7 @@ def main():
 
         result = runNetwork(image)
         f.write(f"\t[{result[0]}, {result[1]}, {result[2]}, {result[3]}, {result[4]}, {result[5]}, {result[6]}")
-        f.write(f", {result[7]}, {result[8]}, {result[9]}]{', ' if index != (data.shape[0] -1) else ''}\n")
+        f.write(f", {result[7]}, {result[8]}, {result[9]}]{', ' if index != (data.shape[0] -1) else ''}")
 
         # print(testY[index])
         # print(result)
@@ -141,6 +141,9 @@ def main():
             # print(index)
             # print(result)
             i +=1
+            f.write("\n")
+        else:
+            f.write(f"#incorrect {answer}\n")
     print(f'{i/data.shape[0]}')
     f.write(f'])\n\n # Correct: {i/data.shape[0]}')
 
