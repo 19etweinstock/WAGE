@@ -12,5 +12,5 @@ batchSize = 50
 
 lr_schedule = [0, 1., 20, 0.7, 35, 0.2]
 
-# loadModel = None
-loadModel = '2021-12-03 1640(MNIST 1288 8 [0, 1.0, 20, 0.7, 35, 0.2] 50 50)'
+loadModel = None
+# loadModel = '2021-12-03 1640(MNIST 1288 8 [0, 1.0, 20, 0.7, 35, 0.2] 50 50)'
