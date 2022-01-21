@@ -1,0 +1,113 @@
+2022-01-10 2218
+LR    = 1
+bitsW = 15  # bit width of weights
+bitsA = 15 # bit width of activations
+bitsG = 15  # bit width of gradients
+bitsE = 15 # bit width of errors
+
+bitsR = 15  # bit width of randomizer
+
+loops = 1
+Epoch = 25
+batchSize = 50
+
+lr_schedule = [0, 1., 20, 0.7, 35, 0.2]
+
+loadModel = None
+# loadModel = '2021-12-03 1640(MNIST 1288 8 [0, 1.0, 20, 0.7, 35, 0.2] 50 50)'
+
+[[0, 20, 35], [1.0, 1.0, 0.7, 0.2]]
+Model: "lenet5"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+qa (qa)                      multiple                  0         
+_________________________________________________________________
+qconv2d (qconv2d)            multiple                  150       
+_________________________________________________________________
+maxpool (maxpool)            multiple                  0         
+_________________________________________________________________
+qactivation (qactivation)    multiple                  0         
+_________________________________________________________________
+qconv2d_1 (qconv2d)          multiple                  1200      
+_________________________________________________________________
+maxpool_1 (maxpool)          multiple                  0         
+_________________________________________________________________
+qactivation_1 (qactivation)  multiple                  0         
+_________________________________________________________________
+reshape (reshape)            multiple                  0         
+_________________________________________________________________
+qfc (qfc)                    multiple                  15360     
+_________________________________________________________________
+qactivation_2 (qactivation)  multiple                  0         
+_________________________________________________________________
+qfc_1 (qfc)                  multiple                  10080     
+_________________________________________________________________
+qactivation_3 (qactivation)  multiple                  0         
+_________________________________________________________________
+qfc_2 (qfc)                  multiple                  840       
+_________________________________________________________________
+qsoftmax (qsoftmax)          multiple                  0         
+=================================================================
+Total params: 27,630
+Trainable params: 27,630
+Non-trainable params: 0
+_________________________________________________________________
+conv/qconv2d [5, 5, 1, 6] Scale: 1.0
+conv/qconv2d_1 [5, 5, 6, 8] Scale: 1.0
+fc/qfc [128, 120] Scale: 1.0
+fc/qfc_1 [120, 84] Scale: 1.0
+fc/qfc_2 [84, 10] Scale: 1.0
+CONV: 1350 FC: 26280 TOTAL: 27630
+Epoch 1/25
+1200/1200 [==============================] - 14s 10ms/step - loss: 46.9671 - accuracy: 0.1815 - val_loss: 231.3135 - val_accuracy: 0.2570
+Epoch 2/25
+1200/1200 [==============================] - 12s 10ms/step - loss: 44.4292 - accuracy: 0.2867 - val_loss: 222.3616 - val_accuracy: 0.3229
+Epoch 3/25
+1200/1200 [==============================] - 12s 10ms/step - loss: 42.8772 - accuracy: 0.3446 - val_loss: 215.3921 - val_accuracy: 0.3640
+Epoch 4/25
+1200/1200 [==============================] - 13s 10ms/step - loss: 41.6308 - accuracy: 0.3785 - val_loss: 209.3098 - val_accuracy: 0.3972
+Epoch 5/25
+1200/1200 [==============================] - 27s 23ms/step - loss: 40.4896 - accuracy: 0.4023 - val_loss: 203.4163 - val_accuracy: 0.4142
+Epoch 6/25
+1200/1200 [==============================] - 48s 40ms/step - loss: 39.0222 - accuracy: 0.4241 - val_loss: 194.1001 - val_accuracy: 0.4524
+Epoch 7/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 37.3200 - accuracy: 0.4703 - val_loss: 186.3072 - val_accuracy: 0.4966
+Epoch 8/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 35.9542 - accuracy: 0.5045 - val_loss: 179.7640 - val_accuracy: 0.5213
+Epoch 9/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 34.7764 - accuracy: 0.5269 - val_loss: 174.0508 - val_accuracy: 0.5363
+Epoch 10/25
+1200/1200 [==============================] - 14s 12ms/step - loss: 33.7248 - accuracy: 0.5406 - val_loss: 168.8174 - val_accuracy: 0.5495
+Epoch 11/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 32.7692 - accuracy: 0.5516 - val_loss: 164.1489 - val_accuracy: 0.5604
+Epoch 12/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 31.9006 - accuracy: 0.5595 - val_loss: 159.9396 - val_accuracy: 0.5677
+Epoch 13/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 31.1125 - accuracy: 0.5658 - val_loss: 156.0357 - val_accuracy: 0.5734
+Epoch 14/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 30.4019 - accuracy: 0.5725 - val_loss: 152.6555 - val_accuracy: 0.5791
+Epoch 15/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 29.7514 - accuracy: 0.5775 - val_loss: 149.5104 - val_accuracy: 0.5845
+Epoch 16/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 29.1537 - accuracy: 0.5824 - val_loss: 146.6129 - val_accuracy: 0.5876
+Epoch 17/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 28.5715 - accuracy: 0.5873 - val_loss: 143.5641 - val_accuracy: 0.5932
+Epoch 18/25
+1200/1200 [==============================] - 14s 11ms/step - loss: 27.9288 - accuracy: 0.5941 - val_loss: 139.7881 - val_accuracy: 0.6032
+Epoch 19/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 27.1367 - accuracy: 0.6090 - val_loss: 135.2179 - val_accuracy: 0.6233
+Epoch 20/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 26.3699 - accuracy: 0.6250 - val_loss: 131.5847 - val_accuracy: 0.6385
+Epoch 21/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 25.7422 - accuracy: 0.6370 - val_loss: 128.5258 - val_accuracy: 0.6472
+Epoch 22/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 25.2012 - accuracy: 0.6463 - val_loss: 125.7948 - val_accuracy: 0.6574
+Epoch 23/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 24.7225 - accuracy: 0.6534 - val_loss: 123.4211 - val_accuracy: 0.6638
+Epoch 24/25
+1200/1200 [==============================] - 13s 11ms/step - loss: 24.2888 - accuracy: 0.6594 - val_loss: 121.2382 - val_accuracy: 0.6669
+Epoch 25/25
+1200/1200 [==============================] - 14s 11ms/step - loss: 23.8903 - accuracy: 0.6640 - val_loss: 119.2530 - val_accuracy: 0.6727
+40/40 [==============================] - 0s 6ms/step - loss: 119.2530 - accuracy: 0.6727
+235/235 [==============================] - 1s 6ms/step - loss: 121.2154 - accuracy: 0.6665

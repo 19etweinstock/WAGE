@@ -28,7 +28,7 @@ Time = time.strftime('%Y-%m-%d %H%M', time.localtime())
 def upper(str):
     return str.upper()
 
-Notes = f'MNIST {Option.bitsW}{Option.bitsA}{upper(hex(Option.bitsG)[2:])}{upper(hex(Option.bitsE)[2:])} {Option.bitsR} {Option.lr_schedule} {Option.Epoch} {Option.batchSize}'
+Notes = f'MNIST {upper(hex(Option.bitsW))[2:]}{upper(hex(Option.bitsA))[2:]}{upper(hex(Option.bitsG)[2:])}{upper(hex(Option.bitsE)[2:])} {Option.bitsR} {Option.lr_schedule} {Option.Epoch} {Option.batchSize}'
 
 pathLog = '../log/' + Time + '(' + Notes + ')' + '.txt'
 log = Log.Log(pathLog, 'wt', 1) # set log file

@@ -1,0 +1,10 @@
+2022-01-10 2209
+Epoch 1/10
+469/469 [==============================] - 4s 4ms/step - loss: 229.5300 - accuracy: 0.1019 - val_loss: 229.8304 - val_accuracy: 0.1010
+Epoch 2/10
+469/469 [==============================] - 2s 4ms/step - loss: 229.7515 - accuracy: 0.1022 - val_loss: 229.8304 - val_accuracy: 0.1010
+Epoch 3/10
+469/469 [==============================] - 2s 4ms/step - loss: 229.7461 - accuracy: 0.1022 - val_loss: 229.8304 - val_accuracy: 0.1010
+Epoch 4/10
+469/469 [==============================] - 2s 4ms/step - loss: 229.7493 - accuracy: 0.1022 - val_loss: 229.8304 - val_accuracy: 0.1010
+Epoch 5/10
