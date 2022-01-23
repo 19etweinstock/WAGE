@@ -35,16 +35,16 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.losses as losses
 
 model = models.Sequential()
-model.add(layers.Conv2D(6, 5, input_shape=x_train.shape[1:]))
+model.add(layers.Conv2D(6, 5, input_shape=x_train.shape[1:], use_bias=False))
 model.add(layers.MaxPool2D(2))
 model.add(layers.Activation('relu'))
-model.add(layers.Conv2D(8, 5))
+model.add(layers.Conv2D(8, 5, use_bias=False))
 model.add(layers.MaxPool2D(2))
 model.add(layers.Activation('relu'))
 model.add(layers.Flatten())
-model.add(layers.Dense(120, activation='relu'))
-model.add(layers.Dense(84, activation='relu'))
-model.add(layers.Dense(10, activation='softmax'))
+model.add(layers.Dense(120, activation='relu', use_bias=False))
+model.add(layers.Dense(84, activation='relu', use_bias=False))
+model.add(layers.Dense(10, activation='softmax', use_bias=False))
 model.summary()
 
 
@@ -56,5 +56,5 @@ model.summary()
 
 model.compile(optimizer='sgd', loss='mse', metrics=['accuracy'], run_eagerly=False)
 
-model.fit(x_train, y_train, epochs=40,batch_size=64, validation_data=(x_test, y_test))
+model.fit(x_train, y_train, epochs=60,batch_size=50, validation_data=(x_test, y_test))
 model.evaluate(x_test, y_test)

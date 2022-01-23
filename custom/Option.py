@@ -6,7 +6,7 @@ bitsE = 8 # bit width of errors
 
 bitsR = 8  # bit width of randomizer
 
-loops = 2
+loops = 8
 Epoch = 50
 batchSize = 50
 
