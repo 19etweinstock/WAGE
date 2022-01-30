@@ -4,9 +4,13 @@ import os
 # 9670 9613 reaches 9652 
 # 9675 9613 reaches 9640 
 # 9679 9663 reaches 9656 9632
-# 9680 9610 reaches 9656 
+# 9680 9610 reaches 9656
+# 9684 9665 reaches 9666 96365
+# 9686 9657 reaches 9656 
 
-import weights_9679_9663 as weights
+# 9684 is the best weight set
+
+import weights_9684_9665 as weights
 
 import sys
 
@@ -110,10 +114,10 @@ def runNetwork(image):
 def main():
     trainX, trainY, testX, testY, label = loadData('MNIST')
 
-    data = testX / 256.0
-    answers = testY
+    data = trainX / 256.0
+    answers = trainY
 
-    f = open(f'test_out_9679_9663.py', "wt")
+    f = open(f'train_out_9684_9665.py', "wt")
     f.write("\nimport numpy as np\n\n")
 
     f.write('output = np.array([')
