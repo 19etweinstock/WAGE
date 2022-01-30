@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "cwd": "${workspaceFolder}/custom",
+            "cwd": "${workspaceFolder}/training",
             "console": "integratedTerminal",
             "justMyCode": false
 
@@ -18,9 +18,9 @@
             "name": "Python Custom Top",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/custom/Top.py",
+            "program": "${workspaceFolder}/training/Top.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/custom",
+            "cwd": "${workspaceFolder}/training",
             "justMyCode": false
         }
     ]
