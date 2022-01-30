@@ -8,10 +8,10 @@ os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/b
 import tensorflow as tf
 import numpy as np
 import time
-import Option
-import Log
+from . import Option
+from . import Log
 from functools import reduce
-import Model
+from . import Model
 
 from matplotlib import pyplot as plt
 import seaborn as sns
