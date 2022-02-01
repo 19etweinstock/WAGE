@@ -6,11 +6,10 @@
 import os
 os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4/bin") 
 import sys
-sys.path.append("..")
 sys.path.append("../training")
 import tensorflow as tf
 import numpy as np
-from training import Model
+import Model, Quantize
 
 mnist = tf.keras.datasets.mnist
 (x_train, y_train),(x_test, y_test) = mnist.load_data()
@@ -52,11 +51,11 @@ model.compile(optimizer='sgd', loss='mse', metrics=['accuracy'], run_eagerly=Fal
 
 model.fit(x_train, y_train, epochs=1,batch_size=256)
 
-model.layers[0].set_weights(model_quant.layers[1].get_weights())
-model.layers[3].set_weights(model_quant.layers[4].get_weights())
-model.layers[7].set_weights(model_quant.layers[8].get_weights())
-model.layers[9].set_weights(model_quant.layers[10].get_weights())
-model.layers[11].set_weights(model_quant.layers[12].get_weights())
+model.layers[0].set_weights(Quantize.W(model_quant.layers[1].get_weights(), Quantize.W_scale[0]))
+model.layers[3].set_weights(Quantize.W(model_quant.layers[4].get_weights(), Quantize.W_scale[1]))
+model.layers[7].set_weights(Quantize.W(model_quant.layers[8].get_weights(), Quantize.W_scale[2]))
+model.layers[9].set_weights(Quantize.W(model_quant.layers[10].get_weights(), Quantize.W_scale[3]))
+model.layers[11].set_weights(Quantize.W(model_quant.layers[12].get_weights(), Quantize.W_scale[4]))
 
 
 saved_model_dir = 'saved_model.json'
@@ -66,3 +65,62 @@ json_string = model.to_json()
 with open(saved_model_dir, "w+") as f:
     f.write(json_string)
 model.save_weights(saved_weights_dir)
+
+vars = model.variables
+
+f = open(f'test.py', "wt")
+f.write("\nimport numpy as np\n\n")
+f.flush()
+
+for var in range(0,2):
+    tensor=vars[var].value()
+    for in_filter in range(0, tensor.shape.as_list()[2]):
+        for out_filter in range(0,tensor.shape.as_list()[3]):
+            f.write(f"conv{var}_in{in_filter}_out{out_filter} = np.array([\n")
+            quant = tensor
+            quant_array = quant.numpy()
+            for row in range(0,5):
+                f.write("\t[")
+                for col in range(0,5):
+                    f.write(f"{quant_array[row,col,in_filter,out_filter]}{', ' if col != 4 else ''}")
+                f.write("]")
+                if (row != 4):
+                    f.write(",\n")
+                
+            f.write("])\n\n")
+            f.flush()
+    for out_filter in range(0, tensor.shape.as_list()[3]):
+        f.write(f"weights_conv{var}_out{out_filter} = np.array([\n")
+        for in_filter in range(0, tensor.shape.as_list()[2]):
+            f.write(f"\tconv{var}_in{in_filter}_out{out_filter}")
+            if (in_filter != tensor.shape.as_list()[2] - 1):
+                f.write(",\n")
+            else:
+                f.write("])\n\n")
+    
+    f.write(f"weights_conv{var} = np.array([\n")
+    for out_filter in range(0, tensor.shape.as_list()[3]):
+        f.write(f"\tweights_conv{var}_out{out_filter}")
+        if (out_filter != tensor.shape.as_list()[3] - 1):
+            f.write(",\n")
+        else:
+            f.write("])\n\n")
+for var in range(2,5):
+    tensor=vars[var].value()
+    quant = tensor
+    quant_array = quant.numpy()
+    f.write(f"fc{var-2} = np.array([\n")
+    rows=tensor.shape.as_list()[0]
+    cols=tensor.shape.as_list()[1]
+    for row in range(0,rows):
+        f.write("\t[")
+        for col in range(0, cols):
+            f.write(f"{quant_array[row,col]}{', ' if col != (cols-1) else ''}")
+        f.write("]")
+        if (row != (rows -1)):
+            f.write(",\n")
+        
+    f.write("])\n\n")
+    f.flush()
+        
+f.close()
