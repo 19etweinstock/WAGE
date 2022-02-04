@@ -56,7 +56,7 @@ def pool(img, factor=2):
     return ds_img
 
 def loadData(dataSet,validNum=0):
-    pathNPZ = '../classification/' + dataSet + '.npz'
+    pathNPZ = '/' + dataSet + '.npz'
     numpyTrainX, numpyTrainY, numpyTestX, numpyTestY, label = loadNPZ(pathNPZ, validNum)
     return numpyTrainX,numpyTrainY,numpyTestX,numpyTestY,label
 
@@ -118,32 +118,41 @@ def main():
     data = testX / 256.0
     answers = testY
 
-    index = 0
+    f = open(f'test_out_9681_9628.py', "wt")
+    f.write("\nimport numpy as np\n\n")
 
-    image = data[index,:,:,0]
-    answer = getAnswer(answers[index])
+    f.write('output = np.array([')
+    i = 0
+    for index in range(0, data.shape[0]):
 
-    result = runNetwork(image)
-    print(testY[index])
-    print(result)
-    print(np.maximum(result, 0))
+    # index = int(sys.argv[1])
+    # index = 8
 
-    # process result
+        image = data[index,:,:,0]
+        answer = getAnswer(answers[index])
+
+        result = runNetwork(image)
+        f.write(f"\t[{result[0]}, {result[1]}, {result[2]}, {result[3]}, {result[4]}, {result[5]}, {result[6]}")
+        f.write(f", {result[7]}, {result[8]}, {result[9]}]{', ' if index != (data.shape[0] -1) else ''}")
+
+        # print(testY[index])
+        # print(result)
+        # print(np.maximum(result, 0))
+
+        # process result
+        max = np.max(result)
+        check = result == max
+        if (np.sum(check) == 1 and check[answer] == 1):
+            # print(index)
+            # print(result)
+            i +=1
+            f.write("\n")
+        else:
+            f.write(f"#incorrect {answer}\n")
+    print(f'{i/data.shape[0]}')
+    f.write(f'])\n\n # Correct: {i/data.shape[0]}')
+
 
 
 if __name__ == '__main__':
     main()
-
-
-"""
-for i in range(0,28):
-    for j in range(0,28):
-        print(int(activate(image)[i,j]*2), end=' ')
-    print("")
-
-
-for i in range(0,24):
-    for j in range(0,24):
-        print(int(activate(conv2D(image, weights.weights_conv0[0, 0, :, :])[i,j])*2), end=' ')
-    print("")
-"""
