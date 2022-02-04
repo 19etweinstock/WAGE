@@ -34,30 +34,30 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.losses as losses
 
 model = models.Sequential()
-model.add(layers.Conv2D(6, 5, input_shape=x_train.shape[1:], use_bias=True))
+model.add(layers.Conv2D(6, 5, input_shape=x_train.shape[1:], use_bias=True, activation='relu'))
 model.add(layers.MaxPool2D(2))
-model.add(layers.Activation("relu"))
-model.add(layers.Conv2D(8, 5, use_bias=True))
+# model.add(layers.Activation("relu"))
+model.add(layers.Conv2D(8, 5, use_bias=True, activation='relu'))
 model.add(layers.MaxPool2D(2))
-model.add(layers.Activation("relu"))
+# model.add(layers.Activation("relu"))
 model.add(layers.Flatten())
-model.add(layers.Dense(120, use_bias=True))
-model.add(layers.Activation("relu"))
-model.add(layers.Dense(84, use_bias=True))
-model.add(layers.Activation("relu"))
-model.add(layers.Dense(10, use_bias=True))
+model.add(layers.Dense(120, use_bias=True, activation='relu'))
+# model.add(layers.Activation("relu"))
+model.add(layers.Dense(84, use_bias=True, activation='relu'))
+# model.add(layers.Activation("relu"))
+model.add(layers.Dense(10, use_bias=True, activation='relu'))
 
 model.compile(optimizer='sgd', loss='mse', metrics=['accuracy'], run_eagerly=True)
 a=Quantize.W(model_quant.layers[ 1].get_weights()[0], Quantize.W_scale[0]).numpy(), model.layers[ 0].get_weights()[1]
-b=Quantize.W(model_quant.layers[ 4].get_weights()[0], Quantize.W_scale[1]).numpy(), model.layers[ 3].get_weights()[1]
-c=Quantize.W(model_quant.layers[ 8].get_weights()[0], Quantize.W_scale[2]).numpy(), model.layers[ 7].get_weights()[1]
-d=Quantize.W(model_quant.layers[10].get_weights()[0], Quantize.W_scale[3]).numpy(), model.layers[ 9].get_weights()[1]
-e=Quantize.W(model_quant.layers[12].get_weights()[0], Quantize.W_scale[4]).numpy(), model.layers[11].get_weights()[1]
+b=Quantize.W(model_quant.layers[ 4].get_weights()[0], Quantize.W_scale[1]).numpy(), model.layers[ 2].get_weights()[1]
+c=Quantize.W(model_quant.layers[ 8].get_weights()[0], Quantize.W_scale[2]).numpy(), model.layers[ 5].get_weights()[1]
+d=Quantize.W(model_quant.layers[10].get_weights()[0], Quantize.W_scale[3]).numpy(), model.layers[ 6].get_weights()[1]
+e=Quantize.W(model_quant.layers[12].get_weights()[0], Quantize.W_scale[4]).numpy(), model.layers[ 7].get_weights()[1]
 model.layers[ 0].set_weights(weights=a)
-model.layers[ 3].set_weights(weights=b)
-model.layers[ 7].set_weights(weights=c)
-model.layers[ 9].set_weights(weights=d)
-model.layers[11].set_weights(weights=e)
+model.layers[ 2].set_weights(weights=b)
+model.layers[ 5].set_weights(weights=c)
+model.layers[ 6].set_weights(weights=d)
+model.layers[ 7].set_weights(weights=e)
 
 
 saved_model_dir = 'saved_model.json'
