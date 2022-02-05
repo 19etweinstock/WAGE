@@ -15,6 +15,8 @@ import weights_9684_9665 as weights
 
 import sys
 
+from keras.datasets import mnist
+
 import numpy as np
 
 def conv2D(var, kernel):
@@ -55,29 +57,6 @@ def pool(img, factor=2):
     np.maximum.at(ds_img, (np.arange(img.shape[0])[:, None] // factor, np.arange(img.shape[1]) // factor), img)
     return ds_img
 
-def loadData(dataSet,validNum=0):
-    pathNPZ = '../classification/' + dataSet + '.npz'
-    numpyTrainX, numpyTrainY, numpyTestX, numpyTestY, label = loadNPZ(pathNPZ, validNum)
-    return numpyTrainX,numpyTrainY,numpyTestX,numpyTestY,label
-
-def loadNPZ(pathNPZ, validNum=0):
-  data = np.load(pathNPZ)
-
-  trainX = data['trainX']
-  trainY = data['trainY']
-
-  if validNum > 100:
-    testX = trainX[-validNum:]
-    testY = trainY[-validNum:]
-    trainX = trainX[0:-validNum]
-    trainY = trainY[0:-validNum]
-  else:
-    testX = data['testX']
-    testY = data['testY']
-
-  label = data['label']
-  return trainX, trainY, testX, testY, label
-
 def getAnswer(label):
     for i in range(0,10):
         if (label[i] == 1):
@@ -113,7 +92,7 @@ def runNetwork(image):
     return x
 
 def main():
-    trainX, trainY, testX, testY, label = loadData('MNIST')
+    (trainX, trainY), (testX, testY) = mnist.load_data()
 
     data = testX / 256.0
     answers = testY
