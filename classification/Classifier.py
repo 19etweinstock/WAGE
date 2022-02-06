@@ -57,11 +57,6 @@ def pool(img, factor=2):
     np.maximum.at(ds_img, (np.arange(img.shape[0])[:, None] // factor, np.arange(img.shape[1]) // factor), img)
     return ds_img
 
-def getAnswer(label):
-    for i in range(0,10):
-        if (label[i] == 1):
-            return i
-
 def runNetwork(image):
 
     image = activate(image)
@@ -78,16 +73,16 @@ def runNetwork(image):
         for j in range(0, feature_maps_layer0):
             feature_map_conv1[i, :, :] += conv2D(feature_map_conv0[j,:,:], weights.weights_conv1[i, j, :, :])
 
-    x = np.zeros([16*feature_maps_layer1])
+    x1 = np.zeros([16*feature_maps_layer1])
 
     for i in range(0, feature_maps_layer1):
-        x[i*16:i*16+16] = np.reshape(activate(pool(feature_map_conv1[i,:,:])), [16])
+        x1[i*16:i*16+16] = np.reshape(activate(pool(feature_map_conv1[i,:,:])), [16])
 
-    x = np.matmul(x,weights.fc0)
-    x = activate(x)
-    x = np.matmul(x,weights.fc1)
-    x = activate(x)
-    x = np.matmul(x,weights.fc2)
+    x2 = np.matmul(x1,weights.fc0)
+    x3 = activate(x2)
+    x4 = np.matmul(x3,weights.fc1)
+    x5 = activate(x4)
+    x = np.matmul(x5,weights.fc2)
 
     return x
 
@@ -99,8 +94,8 @@ def main():
 
     index = 0
 
-    image = data[index,:,:,0]
-    answer = getAnswer(answers[index])
+    image = data[index,:,:]
+    answer = answers[index]
 
     result = runNetwork(image)
     print(testY[index])
