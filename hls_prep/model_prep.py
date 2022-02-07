@@ -34,34 +34,34 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.losses as losses
 
 model = models.Sequential()
-model.add(layers.Conv2D(6, 5, input_shape=x_train.shape[1:], use_bias=True, activation='relu'))
+model.add(layers.Conv2D(6, 5, input_shape=x_train.shape[1:], use_bias=False))
 model.add(layers.MaxPool2D(2))
 # model.add(layers.Activation("relu"))
-model.add(layers.Conv2D(8, 5, use_bias=True, activation='relu'))
+model.add(layers.Conv2D(8, 5, use_bias=False))
 model.add(layers.MaxPool2D(2))
 # model.add(layers.Activation("relu"))
 model.add(layers.Flatten())
-model.add(layers.Dense(120, use_bias=True, activation='relu'))
+model.add(layers.Dense(120, use_bias=False))
 # model.add(layers.Activation("relu"))
-model.add(layers.Dense(84, use_bias=True, activation='relu'))
+model.add(layers.Dense(84, use_bias=False))
 # model.add(layers.Activation("relu"))
-model.add(layers.Dense(10, use_bias=True, activation='relu'))
+model.add(layers.Dense(10, use_bias=False))
 
 model.compile(optimizer='sgd', loss='mse', metrics=['accuracy'], run_eagerly=True)
-a=Quantize.W(model_quant.layers[ 1].get_weights()[0], Quantize.W_scale[0]).numpy(), model.layers[ 0].get_weights()[1]
-b=Quantize.W(model_quant.layers[ 4].get_weights()[0], Quantize.W_scale[1]).numpy(), model.layers[ 2].get_weights()[1]
-c=Quantize.W(model_quant.layers[ 8].get_weights()[0], Quantize.W_scale[2]).numpy(), model.layers[ 5].get_weights()[1]
-d=Quantize.W(model_quant.layers[10].get_weights()[0], Quantize.W_scale[3]).numpy(), model.layers[ 6].get_weights()[1]
-e=Quantize.W(model_quant.layers[12].get_weights()[0], Quantize.W_scale[4]).numpy(), model.layers[ 7].get_weights()[1]
-model.layers[ 0].set_weights(weights=a)
-model.layers[ 2].set_weights(weights=b)
-model.layers[ 5].set_weights(weights=c)
-model.layers[ 6].set_weights(weights=d)
-model.layers[ 7].set_weights(weights=e)
+# a=Quantize.W(model_quant.layers[ 1].get_weights()[0], Quantize.W_scale[0]).numpy(), model.layers[ 0].get_weights()[1]
+# b=Quantize.W(model_quant.layers[ 4].get_weights()[0], Quantize.W_scale[1]).numpy(), model.layers[ 2].get_weights()[1]
+# c=Quantize.W(model_quant.layers[ 8].get_weights()[0], Quantize.W_scale[2]).numpy(), model.layers[ 5].get_weights()[1]
+# d=Quantize.W(model_quant.layers[10].get_weights()[0], Quantize.W_scale[3]).numpy(), model.layers[ 6].get_weights()[1]
+# e=Quantize.W(model_quant.layers[12].get_weights()[0], Quantize.W_scale[4]).numpy(), model.layers[ 7].get_weights()[1]
+model.layers[ 0].set_weights(weights=Quantize.W(model_quant.layers[ 1].get_weights(), Quantize.W_scale[0]))
+model.layers[ 2].set_weights(weights=Quantize.W(model_quant.layers[ 4].get_weights(), Quantize.W_scale[1]))
+model.layers[ 5].set_weights(weights=Quantize.W(model_quant.layers[ 8].get_weights(), Quantize.W_scale[2]))
+model.layers[ 6].set_weights(weights=Quantize.W(model_quant.layers[10].get_weights(), Quantize.W_scale[3]))
+model.layers[ 7].set_weights(weights=Quantize.W(model_quant.layers[12].get_weights(), Quantize.W_scale[4]))
 
 
-saved_model_dir = 'saved_model.json'
-saved_weights_dir = 'saved_weights.h5'
+saved_model_dir = 'saved_model_no_relu_bias.json'
+saved_weights_dir = 'saved_weights_no_relu_bias.h5'
 
 json_string = model.to_json()
 with open(saved_model_dir, "w+") as f:
@@ -74,11 +74,11 @@ f = open(f'test.py', "wt")
 f.write("\nimport numpy as np\n\n")
 f.flush()
 
-for var in range(0,4,2):
+for var in [0,1]:
     tensor=vars[var].value()
     for in_filter in range(0, tensor.shape.as_list()[2]):
         for out_filter in range(0,tensor.shape.as_list()[3]):
-            f.write(f"conv{var//2}_in{in_filter}_out{out_filter} = np.array([\n")
+            f.write(f"conv{var}_in{in_filter}_out{out_filter} = np.array([\n")
             quant = tensor
             quant_array = quant.numpy()
             for row in range(0,5):
@@ -92,26 +92,26 @@ for var in range(0,4,2):
             f.write("])\n\n")
             f.flush()
     for out_filter in range(0, tensor.shape.as_list()[3]):
-        f.write(f"weights_conv{var//2}_out{out_filter} = np.array([\n")
+        f.write(f"weights_conv{var}_out{out_filter} = np.array([\n")
         for in_filter in range(0, tensor.shape.as_list()[2]):
-            f.write(f"\tconv{var//2}_in{in_filter}_out{out_filter}")
+            f.write(f"\tconv{var}_in{in_filter}_out{out_filter}")
             if (in_filter != tensor.shape.as_list()[2] - 1):
                 f.write(",\n")
             else:
                 f.write("])\n\n")
     
-    f.write(f"weights_conv{var//2} = np.array([\n")
+    f.write(f"weights_conv{var} = np.array([\n")
     for out_filter in range(0, tensor.shape.as_list()[3]):
-        f.write(f"\tweights_conv{var//2}_out{out_filter}")
+        f.write(f"\tweights_conv{var}_out{out_filter}")
         if (out_filter != tensor.shape.as_list()[3] - 1):
             f.write(",\n")
         else:
             f.write("])\n\n")
-for var in range(4,10,2):
+for var in [2,3,4]:
     tensor=vars[var].value()
     quant = tensor
     quant_array = quant.numpy()
-    f.write(f"fc{var//2-2} = np.array([\n")
+    f.write(f"fc{var-2} = np.array([\n")
     rows=tensor.shape.as_list()[0]
     cols=tensor.shape.as_list()[1]
     for row in range(0,rows):
