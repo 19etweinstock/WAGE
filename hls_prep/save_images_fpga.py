@@ -23,12 +23,12 @@ for i in range(0,10):
     number = number_arr[i]
 
     image = x_test[index]
-    output = ""
+    output = "b"
     for j in range (27, -1, -1):
         for k in range(27, -1, -1):
             if (image[j][k] > 1/4):
                 output = output + "1"
             else:
                 output = output + "0"
-    with open('fpga_strings/' + str(i)+'.txt', 'w') as outfile:
+    with open('fpga_strings/' + str(number)+'.txt', 'w') as outfile:
         outfile.write(output)
