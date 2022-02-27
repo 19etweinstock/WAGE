@@ -17,6 +17,9 @@ import sys
 
 import numpy as np
 
+from keras.datasets import mnist
+
+
 def conv2D(var, kernel):
     '''3D convolution by sub-matrix summing.
     Args:
@@ -55,34 +58,6 @@ def pool(img, factor=2):
     np.maximum.at(ds_img, (np.arange(img.shape[0])[:, None] // factor, np.arange(img.shape[1]) // factor), img)
     return ds_img
 
-def loadData(dataSet,validNum=0):
-    pathNPZ = '/' + dataSet + '.npz'
-    numpyTrainX, numpyTrainY, numpyTestX, numpyTestY, label = loadNPZ(pathNPZ, validNum)
-    return numpyTrainX,numpyTrainY,numpyTestX,numpyTestY,label
-
-def loadNPZ(pathNPZ, validNum=0):
-  data = np.load(pathNPZ)
-
-  trainX = data['trainX']
-  trainY = data['trainY']
-
-  if validNum > 100:
-    testX = trainX[-validNum:]
-    testY = trainY[-validNum:]
-    trainX = trainX[0:-validNum]
-    trainY = trainY[0:-validNum]
-  else:
-    testX = data['testX']
-    testY = data['testY']
-
-  label = data['label']
-  return trainX, trainY, testX, testY, label
-
-def getAnswer(label):
-    for i in range(0,10):
-        if (label[i] == 1):
-            return i
-
 def runNetwork(image):
 
     image = activate(image)
@@ -113,12 +88,12 @@ def runNetwork(image):
     return x
 
 def main():
-    trainX, trainY, testX, testY, label = loadData('MNIST')
+    (trainX, trainY), (testX, testY) = mnist.load_data()
 
-    data = testX / 256.0
-    answers = testY
+    data = trainX / 256.0
+    answers = trainY
 
-    f = open(f'test_out_9681_9628.py', "wt")
+    f = open(f'train_out_9684_9665.py', "wt")
     f.write("\nimport numpy as np\n\n")
 
     f.write('output = np.array([')
@@ -128,8 +103,8 @@ def main():
     # index = int(sys.argv[1])
     # index = 8
 
-        image = data[index,:,:,0]
-        answer = getAnswer(answers[index])
+        image = data[index,:,:]
+        answer = answers[index]
 
         result = runNetwork(image)
         f.write(f"\t[{result[0]}, {result[1]}, {result[2]}, {result[3]}, {result[4]}, {result[5]}, {result[6]}")
@@ -148,7 +123,7 @@ def main():
             i +=1
             f.write("\n")
         else:
-            f.write(f"#incorrect {answer}\n")
+            f.write(f"#incorrect answer: {answer} prediction: {max}\n")
     print(f'{i/data.shape[0]}')
     f.write(f'])\n\n # Correct: {i/data.shape[0]}')
 
