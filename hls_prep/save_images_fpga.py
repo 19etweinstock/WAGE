@@ -15,7 +15,7 @@ x_test = x_test / 256
 # print('shape shape:', x_test.shape)
 # print(, 'test samples')
 x_test_len = x_test.shape[0]
-index_arr =     list([0,1,2,3,4,7,8,11,18,61])
+index_arr =     list([0,1,2,3,4,7,8,11,30,61])
 number_arr =    list([7,2,1,0,4,9,5, 6, 3, 8])
 
 for i in range(0,10):
