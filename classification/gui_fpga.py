@@ -6,7 +6,10 @@ from tkinter import messagebox
 from PIL import ImageTk,Image,ImageDraw
 from urllib.request import urlopen
 import time
+import Classifier
 import serial
+
+ser = serial.Serial('/dev/ttyUSB0', 115200)
 
 def event_function(event):
     
@@ -66,7 +69,26 @@ def predict():
     img_array=img_array/256.0
 
     # set up python serial port for talking to fpga
-
+    value = 0
+    index = 2 ** 7
+    count = 0
+    for j in range (27, -1, -1):
+        for k in range(27, -1, -1):
+            if (img_array[j][k] > 1/4):
+                value = value + index
+            index = index // 2
+            count = count + 1
+            if (count == 8):
+                s = bin(value).replace("0b",'')
+                if (len(s) != 8):
+                    diff = 8 - len(s)
+                    s = "0" * diff + s
+                print(s, end='')
+                uart_tx = bytes(value)
+                ser.write(uart_tx)
+                value = 0
+                index = 2 ** 7
+                count = 0
 
     result = Classifier.runNetwork(img_array)
     print(result)
