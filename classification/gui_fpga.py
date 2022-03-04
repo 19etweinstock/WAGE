@@ -9,7 +9,7 @@ import time
 import Classifier
 import serial
 
-ser = serial.Serial('/dev/ttyUSB0', 115200)
+ser = serial.Serial('/COM3', 115200)
 
 def event_function(event):
     
@@ -84,7 +84,7 @@ def predict():
                     diff = 8 - len(s)
                     s = "0" * diff + s
                 print(s, end='')
-                uart_tx = bytes(value)
+                uart_tx = bytes([value])
                 ser.write(uart_tx)
                 value = 0
                 index = 2 ** 7
