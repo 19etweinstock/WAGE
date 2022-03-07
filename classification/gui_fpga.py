@@ -6,7 +6,7 @@ from tkinter import messagebox
 from PIL import ImageTk,Image,ImageDraw
 from urllib.request import urlopen
 import time
-import Classifier
+from network import runNetwork
 import serial
 
 ser = serial.Serial('/COM3', 115200)
@@ -90,7 +90,7 @@ def predict():
                 index = 2 ** 7
                 count = 0
 
-    result = Classifier.runNetwork(img_array)
+    result = runNetwork(img_array)
     print(result)
     label=np.argmax(result)
     max = np.max(result)
