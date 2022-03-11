@@ -83,7 +83,7 @@ def predict():
                 if (len(s) != 8):
                     diff = 8 - len(s)
                     s = "0" * diff + s
-                print(s, end='')
+                # print(s, end='')
                 uart_tx = bytes([value])
                 ser.write(uart_tx)
                 value = 0
@@ -91,7 +91,21 @@ def predict():
                 count = 0
 
     result = runNetwork(img_array)
-    print(result)
+    print([result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8], result[9]])
+    max_hw = int.from_bytes(ser.read(1),'little')
+    if (max_hw == 255):
+        max_hw = int.from_bytes(ser.read(1),'little')
+    nine = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    eight = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    seven = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    six = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    five = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    four = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    three = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    two = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    one = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    zero = int.from_bytes(ser.read(1), 'little', signed=True) / 16
+    print([zero, one, two, three, four, five, six, seven, eight, nine])
     label=np.argmax(result)
     max = np.max(result)
     if (result[label] >= 1 and np.sum(result <=0) == 9):
@@ -107,7 +121,7 @@ def predict():
         for i in range(0,10):
             if(result[i] == max):
                 label.append(i)
-    label_status.config(text='Predicted Digit : '+str(label))
+    label_status.config(text='SW : '+str(label) + ' HW: ' + str(max_hw))
     
     
 win=tk.Tk()
