@@ -67,4 +67,4 @@ def runNetwork(image):
     x5 = activate(x4)
     x = np.matmul(x5,weights.fc2)
 
-    return x
+    return x, x5

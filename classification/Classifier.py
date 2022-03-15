@@ -26,7 +26,7 @@ def main():
     image = data[index,:,:]
     answer = answers[index]
 
-    result = runNetwork(image)
+    result, last_layer_input = runNetwork(image)
     print(testY[index])
     print(result)
     print(np.maximum(result, 0))
